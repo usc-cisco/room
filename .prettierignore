@@ -1,7 +1,9 @@
-dist/
 node_modules/
 .next/
-.turbo/
+out/
+build/
+dist/
 coverage/
-pnpm-lock.yaml
-.pnpm-store/
+.turbo/
+bun.lock
+next-env.d.ts
