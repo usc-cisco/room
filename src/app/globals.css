@@ -32,6 +32,8 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-header-foreground: var(--header-foreground);
+  --color-header: var(--header);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -48,24 +50,33 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Page is a soft brand-tinted off-white rather than pure white: 19.79:1
+     text on #FFF reads harsh. Cards stay pure white so they now lift off
+     the page (they were previously identical to it). muted-foreground was
+     darkened to .52 — at .556 it fell to 4.40:1 on the softer page, and
+     --destructive to L .565 for the same reason. */
+  --background: oklch(0.975 0.008 263.866);
+  --foreground: oklch(0.22 0.02 263.866);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.22 0.02 263.866);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.22 0.02 263.866);
   /* Brand #1752F0 — used at its exact value; 6.00:1 on white. */
   --primary: oklch(0.5165 0.243 263.866);
   --primary-foreground: oklch(0.985 0.012 263.866);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  /* Not --primary: the dark-theme primary (#447CFF) only reaches 3.77:1
+     against white, so it cannot carry white text as a surface. */
+  --header: oklch(0.5165 0.243 263.866);
+  --header-foreground: oklch(1 0 0);
+  --secondary: oklch(0.945 0.012 263.866);
+  --secondary-foreground: oklch(0.22 0.02 263.866);
+  --muted: oklch(0.945 0.012 263.866);
+  --muted-foreground: oklch(0.52 0.012 263.866);
+  --accent: oklch(0.945 0.012 263.866);
+  --accent-foreground: oklch(0.22 0.02 263.866);
+  --destructive: oklch(0.565 0.231 27.325);
+  --border: oklch(0.9 0.012 263.866);
+  --input: oklch(0.9 0.012 263.866);
   /* Was oklch(0.708 0 0) = 2.59:1 on white, failing WCAG 1.4.11. */
   --ring: oklch(0.5165 0.243 263.866);
   --chart-1: oklch(0.865 0.127 207.078);
@@ -74,33 +85,43 @@
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar: oklch(0.985 0.006 263.866);
+  --sidebar-foreground: oklch(0.22 0.02 263.866);
   --sidebar-primary: oklch(0.5165 0.243 263.866);
   --sidebar-primary-foreground: oklch(0.985 0.012 263.866);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-accent: oklch(0.945 0.012 263.866);
+  --sidebar-accent-foreground: oklch(0.22 0.02 263.866);
+  --sidebar-border: oklch(0.9 0.012 263.866);
   --sidebar-ring: oklch(0.5165 0.243 263.866);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  /* Surfaces carry a small chroma at the brand hue (263.87) instead of
+     pure neutral, so the greys relate to the blue rather than sitting
+     beside it. Lightness is unchanged, so every audited contrast pair
+     holds (luminance moves by <0.0002). */
+  --background: oklch(0.145 0.02 263.866);
+  --foreground: oklch(0.985 0.005 263.866);
+  --card: oklch(0.205 0.022 263.866);
+  --card-foreground: oklch(0.985 0.005 263.866);
+  --popover: oklch(0.205 0.022 263.866);
+  --popover-foreground: oklch(0.985 0.005 263.866);
   /* Brand hue held exactly; lifted to L .62 (max in-gamut chroma there)
      so primary-as-text clears 4.5:1 on both background and card. */
   --primary: oklch(0.62 0.204 263.866);
   --primary-foreground: oklch(0.18 0.055 263.866);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Dimmed via lightness only (.5165 -> .45); chroma stays at the brand's
+     exact .243 so the bar still reads as the brand blue rather than navy.
+     Dropping chroma instead is what made an earlier attempt unrecognisable.
+     White text sits at 8.09:1. Separation from the page is 2.45:1, so the
+     header carries an explicit bottom border to define its edge. */
+  --header: oklch(0.45 0.243 263.866);
+  --secondary: oklch(0.274 0.026 263.866);
+  --secondary-foreground: oklch(0.985 0.005 263.866);
+  --muted: oklch(0.269 0.026 263.866);
+  --muted-foreground: oklch(0.708 0.03 263.866);
+  --accent: oklch(0.269 0.026 263.866);
+  --accent-foreground: oklch(0.985 0.005 263.866);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -110,12 +131,12 @@
   --chart-3: oklch(0.609 0.126 221.723);
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.205 0.022 263.866);
+  --sidebar-foreground: oklch(0.985 0.005 263.866);
   --sidebar-primary: oklch(0.62 0.204 263.866);
   --sidebar-primary-foreground: oklch(0.18 0.055 263.866);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0.026 263.866);
+  --sidebar-accent-foreground: oklch(0.985 0.005 263.866);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.62 0.204 263.866);
 }
