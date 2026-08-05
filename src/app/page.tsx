@@ -1,19 +1,21 @@
-import { Button } from "@/components/ui/button"
+import { AccountCard } from "@/components/auth/account-card"
+import { SignInCard } from "@/components/auth/sign-in-card"
+import { getSession } from "@/lib/auth/session"
 
-export default function Page() {
+export default async function Page() {
+  const session = await getSession()
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <main className="grid min-h-svh place-items-center p-6">
+      {session ? (
+        <AccountCard
+          name={session.user.name}
+          email={session.user.email}
+          image={session.user.image}
+        />
+      ) : (
+        <SignInCard />
+      )}
+    </main>
   )
 }
