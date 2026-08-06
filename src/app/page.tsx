@@ -1,4 +1,5 @@
 import { SignInCard } from "@/components/auth/sign-in-card"
+import { FloorMap } from "@/components/floor-map/floor-map"
 import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
 import { Container } from "@/components/layout/container"
@@ -22,8 +23,9 @@ export default async function Page() {
       <AppHeader name={user.name} email={user.email} image={user.image} />
 
       <main className="flex-1">
-        {/* Room availability lands here next pass. */}
-        <Container className="py-8 sm:py-12" />
+        <Container className="py-8 sm:py-12">
+          <FloorMap />
+        </Container>
       </main>
 
       <AppFooter />

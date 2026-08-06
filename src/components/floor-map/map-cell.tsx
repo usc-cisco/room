@@ -1,0 +1,111 @@
+"use client"
+
+import { cva } from "class-variance-authority"
+
+import type { FloorSpace } from "@/lib/floor-plan/types"
+import { cn } from "@/lib/utils"
+
+const cellVariants = cva(
+  "relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-none px-1 text-center outline-none motion-safe:transition-[opacity,box-shadow,transform,background-color] motion-safe:duration-150",
+  {
+    variants: {
+      kind: {
+        room: "bg-card text-card-foreground ring-1 ring-foreground/12 hover:ring-primary/60 focus-visible:ring-2 focus-visible:ring-ring motion-safe:hover:-translate-y-px",
+        comfort:
+          "bg-primary/10 text-primary ring-1 ring-primary/25 hover:bg-primary/20 hover:ring-primary/60 focus-visible:ring-2 focus-visible:ring-ring",
+        // Circulation, not a destination: no border, sits below the page.
+        corridor: "bg-map-corridor",
+        excluded: "hatch ring-1 ring-border",
+        stack: "gap-1 bg-transparent p-0",
+      },
+      selected: {
+        true: "z-10 bg-primary text-primary-foreground ring-2 ring-primary",
+        false: "",
+      },
+      state: {
+        idle: "",
+        match: "z-10 ring-2 ring-primary",
+        dimmed: "opacity-35",
+      },
+    },
+    defaultVariants: { selected: false, state: "idle" },
+  }
+)
+
+export type CellState = "idle" | "match" | "dimmed"
+
+interface MapCellProps {
+  space: FloorSpace
+  selected?: boolean
+  state?: CellState
+  onSelect?: (id: string) => void
+  className?: string
+  style?: React.CSSProperties
+}
+
+/**
+ * One block on the plate. Rooms and comfort rooms are buttons; corridors and
+ * excluded floor area are inert and hidden from assistive tech — the legend
+ * carries their meaning, and announcing two dozen unnamed shapes would bury
+ * the rooms someone is actually tabbing for.
+ */
+export function MapCell({
+  space,
+  selected = false,
+  state = "idle",
+  onSelect,
+  className,
+  style,
+}: MapCellProps) {
+  const classes = cn(
+    cellVariants({
+      kind: space.kind,
+      selected,
+      state: selected ? "idle" : state,
+    }),
+    className
+  )
+
+  if (space.kind === "corridor" || space.kind === "excluded") {
+    return <div aria-hidden="true" className={classes} style={style} />
+  }
+
+  const isComfort = space.kind === "comfort"
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={() => onSelect?.(space.id)}
+      className={classes}
+      style={style}
+    >
+      {isComfort ? (
+        <>
+          <span aria-hidden="true" className="font-mono text-[0.625rem]">
+            CR
+          </span>
+          <span className="sr-only">Comfort Room</span>
+        </>
+      ) : (
+        <>
+          {space.code ? (
+            <span className="font-mono text-xs font-medium tracking-tight">
+              {space.code}
+            </span>
+          ) : null}
+          {space.name ? (
+            <span
+              className={cn(
+                "text-[0.625rem] leading-tight text-balance",
+                space.code && "mt-0.5 opacity-70"
+              )}
+            >
+              {space.name}
+            </span>
+          ) : null}
+        </>
+      )}
+    </button>
+  )
+}
