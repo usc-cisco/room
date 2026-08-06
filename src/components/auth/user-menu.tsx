@@ -4,6 +4,7 @@ import { ChevronDown, LogOut } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
 
+import { headerActionClassName } from "@/components/layout/header-action"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -40,13 +41,10 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          {/* Sits on the brand header, so the ghost variant's muted hover and
-              the brand-blue focus ring (1.0:1 against this background) are both
-              overridden with the header foreground. */}
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2 text-header-foreground hover:bg-header-foreground/15 hover:text-header-foreground focus-visible:border-header-foreground focus-visible:ring-header-foreground/50 aria-expanded:bg-header-foreground/15 aria-expanded:text-header-foreground"
+            className={cn("gap-2", headerActionClassName)}
           >
             {image ? (
               <Image

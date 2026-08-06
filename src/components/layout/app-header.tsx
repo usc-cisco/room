@@ -1,6 +1,7 @@
 import Image from "next/image"
 
 import { UserMenu } from "@/components/auth/user-menu"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 import { Container } from "./container"
 
@@ -37,7 +38,10 @@ export function AppHeader({ name, email, image }: AppHeaderProps) {
           <span className="truncate text-xs sm:text-sm">&ndash; room</span>
         </div>
 
-        <UserMenu name={name} email={email} image={image} />
+        <div className="flex shrink-0 items-center gap-1">
+          <ThemeToggle />
+          <UserMenu name={name} email={email} image={image} />
+        </div>
       </Container>
     </header>
   )
