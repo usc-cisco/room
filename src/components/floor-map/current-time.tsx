@@ -1,6 +1,5 @@
 "use client"
 
-import { useNow } from "@/hooks/use-now"
 import { devNow } from "@/lib/schedules/clock"
 import { formatClock, formatLongDate } from "@/lib/schedules/format"
 
@@ -15,8 +14,7 @@ import { formatClock, formatLongDate } from "@/lib/schedules/format"
  * the alternative — holding the heading blank until mount — trades a wrong
  * millisecond for a visible layout shift on every load.
  */
-export function CurrentTime() {
-  const now = useNow()
+export function CurrentTime({ now }: { now: Date }) {
   const frozen = devNow() !== null
 
   return (

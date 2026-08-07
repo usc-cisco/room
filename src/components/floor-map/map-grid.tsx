@@ -8,6 +8,8 @@ import { MapCell, type CellState } from "./map-cell"
 
 interface MapGridProps {
   query: string
+  /** Ids of rooms with a class in session right now. */
+  occupiedIds: ReadonlySet<string>
   selectedId: string | null
   onSelect: (id: string) => void
 }
@@ -19,7 +21,12 @@ interface MapGridProps {
  * The plate keeps a fixed minimum width and scrolls horizontally inside its
  * container: a floor plan squeezed to 320px stops being a floor plan.
  */
-export function MapGrid({ query, selectedId, onSelect }: MapGridProps) {
+export function MapGrid({
+  query,
+  occupiedIds,
+  selectedId,
+  onSelect,
+}: MapGridProps) {
   const hasQuery = query.trim().length > 0
 
   const stateFor = (space: FloorSpace): CellState => {
@@ -41,6 +48,8 @@ export function MapGrid({ query, selectedId, onSelect }: MapGridProps) {
             gridTemplateRows: ROW_TRACKS.join(" "),
           }}
         >
+          <OccupancyKey />
+
           {FLOOR_CELLS.map((cell) => {
             const style = {
               gridColumn: `${cell.col} / span ${cell.span}`,
@@ -58,6 +67,7 @@ export function MapGrid({ query, selectedId, onSelect }: MapGridProps) {
                     <MapCell
                       key={child.id}
                       space={child}
+                      occupied={occupiedIds.has(child.id)}
                       selected={child.id === selectedId}
                       state={stateFor(child)}
                       onSelect={onSelect}
@@ -72,6 +82,7 @@ export function MapGrid({ query, selectedId, onSelect }: MapGridProps) {
               <MapCell
                 key={cell.id}
                 space={cell}
+                occupied={occupiedIds.has(cell.id)}
                 selected={cell.id === selectedId}
                 state={stateFor(cell)}
                 onSelect={onSelect}
@@ -90,6 +101,32 @@ export function MapGrid({ query, selectedId, onSelect }: MapGridProps) {
         </span>
         Map not drawn to scale.
       </p>
+    </div>
+  )
+}
+
+/**
+ * Says what the red tint means.
+ *
+ * Sits in the plate's north-west corner, which no room occupies — the west wing
+ * starts two tracks lower and the north rooms eight columns east — so it costs
+ * no space and scrolls with the plan rather than floating over it.
+ */
+function OccupancyKey() {
+  return (
+    <div
+      className="flex items-center gap-1.5 place-self-start"
+      style={{ gridColumn: "1 / span 8", gridRow: "1" }}
+    >
+      {/* Same tokens as an occupied cell, so the key and the thing it explains
+          cannot drift apart. */}
+      <span
+        aria-hidden="true"
+        className="size-3 shrink-0 bg-destructive/10 ring-1 ring-destructive/40"
+      />
+      <span className="text-[0.625rem] leading-tight text-muted-foreground">
+        In use now
+      </span>
     </div>
   )
 }

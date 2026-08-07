@@ -22,6 +22,12 @@ const cellVariants = cva(
         excluded: "hatch ring-1 ring-border",
         stack: "gap-1 bg-transparent p-0",
       },
+      // Declared after `kind` so it overrides the room surface, and before
+      // `selected`/`state` so both of those still win over it.
+      occupied: {
+        true: "bg-destructive/10 text-destructive ring-1 ring-destructive/40",
+        false: "",
+      },
       selected: {
         true: "z-10 bg-primary text-primary-foreground ring-2 ring-primary",
         false: "",
@@ -32,7 +38,7 @@ const cellVariants = cva(
         dimmed: "opacity-35",
       },
     },
-    defaultVariants: { selected: false, state: "idle" },
+    defaultVariants: { occupied: false, selected: false, state: "idle" },
   }
 )
 
@@ -40,6 +46,8 @@ export type CellState = "idle" | "match" | "dimmed"
 
 interface MapCellProps {
   space: FloorSpace
+  /** A class is in session in this room right now. */
+  occupied?: boolean
   selected?: boolean
   state?: CellState
   onSelect?: (id: string) => void
@@ -59,6 +67,7 @@ interface MapCellProps {
  */
 export function MapCell({
   space,
+  occupied = false,
   selected = false,
   state = "idle",
   onSelect,
@@ -68,6 +77,7 @@ export function MapCell({
   const classes = cn(
     cellVariants({
       kind: space.kind,
+      occupied,
       selected,
       state: selected ? "idle" : state,
     }),
@@ -107,6 +117,9 @@ export function MapCell({
       style={style}
     >
       {label}
+      {/* The tint alone would leave this state invisible to anyone who cannot
+          see the colour, and unreachable by assistive tech. */}
+      {occupied ? <span className="sr-only">In use</span> : null}
     </button>
   )
 }

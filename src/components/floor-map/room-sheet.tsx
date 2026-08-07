@@ -9,7 +9,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { useNow } from "@/hooks/use-now"
 import type { ClassRoom } from "@/lib/floor-plan/types"
 import {
   dayName,
@@ -22,12 +21,19 @@ import { cn } from "@/lib/utils"
 
 interface RoomSheetProps {
   room: ClassRoom | null
+  /** The page's clock, so the sheet and the map agree on "now". */
+  now: Date
   /** Every meeting in this room, all days. Filtered to today here. */
   schedules: readonly RoomSchedule[]
   onOpenChange: (open: boolean) => void
 }
 
-export function RoomSheet({ room, schedules, onOpenChange }: RoomSheetProps) {
+export function RoomSheet({
+  room,
+  now,
+  schedules,
+  onOpenChange,
+}: RoomSheetProps) {
   return (
     <Sheet open={room !== null} onOpenChange={onOpenChange}>
       {/* Deliberately narrower than the viewport on a phone: the map staying
@@ -42,7 +48,7 @@ export function RoomSheet({ room, schedules, onOpenChange }: RoomSheetProps) {
         {/* Radix mounts this only once the sheet opens, which cannot happen
             before a click. Reading the clock below is therefore safe: it never
             runs during the server render, so there is nothing to mismatch. */}
-        {room ? <RoomDay room={room} schedules={schedules} /> : null}
+        {room ? <RoomDay room={room} now={now} schedules={schedules} /> : null}
       </SheetContent>
     </Sheet>
   )
@@ -50,15 +56,13 @@ export function RoomSheet({ room, schedules, onOpenChange }: RoomSheetProps) {
 
 function RoomDay({
   room,
+  now,
   schedules,
 }: {
   room: ClassRoom
+  now: Date
   schedules: readonly RoomSchedule[]
 }) {
-  // Ticks while the sheet is open, so the "Now" marker stays honest across a
-  // class changeover. Also the seam the dev clock override plugs into.
-  const now = useNow()
-
   const today = now.getDay()
   const minutes = minutesOfDay(now)
   const todays = schedules.filter((entry) => entry.dayOfWeek === today)
