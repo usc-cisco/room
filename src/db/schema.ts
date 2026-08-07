@@ -1,5 +1,11 @@
 import { relations, sql } from "drizzle-orm"
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core"
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  check,
+} from "drizzle-orm/sqlite-core"
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -85,6 +91,69 @@ export const verification = sqliteTable(
       .notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)]
+)
+
+/**
+ * A recurring class held in a room, one row per weekly meeting.
+ *
+ * Note: `bun run auth:generate` writes this file. Re-run it with care — the
+ * tables below the auth ones are hand-written and are not reproduced by the
+ * generator.
+ */
+export const schedule = sqliteTable(
+  "schedule",
+  {
+    id: text("id").primaryKey(),
+
+    /**
+     * The `id` of a space in the static floor plan (e.g. `lb445`, `control`),
+     * not a foreign key — rooms live in `src/lib/floor-plan/data.ts`, not the
+     * database, so SQLite cannot enforce this. Validate it against
+     * `FLOOR_ROOMS` at the write boundary.
+     */
+    roomId: text("room_id").notNull(),
+
+    courseCode: text("course_code").notNull(),
+    courseDescription: text("course_description").notNull(),
+    /** Section/block the class is for, e.g. `G1`. */
+    group: text("group").notNull(),
+    /** Degree program the section belongs to, e.g. `BSIT`. */
+    program: text("program").notNull(),
+
+    /** 0 = Sunday through 6 = Saturday, matching JS `Date.getDay()`. */
+    dayOfWeek: integer("day_of_week").notNull(),
+
+    /**
+     * Wall-clock time as zero-padded 24-hour `HH:MM`. Text rather than a
+     * timestamp because these repeat weekly and carry no date; zero-padding
+     * keeps them correctly sortable and comparable as plain strings.
+     */
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    // The query this table exists to answer: what is on in this room, today.
+    index("schedule_roomId_dayOfWeek_idx").on(table.roomId, table.dayOfWeek),
+    check(
+      "schedule_day_of_week_range",
+      sql`${table.dayOfWeek} between 0 and 6`
+    ),
+    check(
+      "schedule_start_time_format",
+      sql`${table.startTime} glob '[0-2][0-9]:[0-5][0-9]'`
+    ),
+    check(
+      "schedule_end_time_format",
+      sql`${table.endTime} glob '[0-2][0-9]:[0-5][0-9]'`
+    ),
+    // A class cannot end before it starts. String comparison is correct here
+    // because both sides are zero-padded 24-hour times.
+    check("schedule_time_order", sql`${table.endTime} > ${table.startTime}`),
+  ]
 )
 
 export const userRelations = relations(user, ({ many }) => ({
