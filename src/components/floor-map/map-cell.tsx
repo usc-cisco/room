@@ -6,7 +6,7 @@ import type { FloorSpace } from "@/lib/floor-plan/types"
 import { cn } from "@/lib/utils"
 
 const cellVariants = cva(
-  "relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-none px-1 text-center outline-none motion-safe:transition-[opacity,box-shadow,transform,background-color] motion-safe:duration-150",
+  "relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-none px-px text-center outline-none motion-safe:transition-[opacity,box-shadow,transform,background-color] motion-safe:duration-150 md:px-1",
   {
     variants: {
       kind: {
@@ -129,14 +129,14 @@ function SpaceLabel({ space }: { space: FloorSpace }) {
   return (
     <>
       {space.code ? (
-        <span className="font-mono text-xs font-medium tracking-tight">
+        <span className="max-w-full font-mono text-[0.625rem] font-medium tracking-tight break-all md:text-xs">
           {space.code}
         </span>
       ) : null}
       {space.name ? (
         <span
           className={cn(
-            "text-[0.625rem] leading-tight text-balance",
+            "max-w-full text-[0.625rem] leading-tight text-balance break-words",
             space.code && "mt-0.5 opacity-70"
           )}
         >

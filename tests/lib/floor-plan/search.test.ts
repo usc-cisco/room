@@ -19,7 +19,7 @@ const comfort: FloorSpace = {
   name: "Comfort Room",
   kind: "comfort",
 }
-const corridor: FloorSpace = { id: "corridor-north", kind: "corridor" }
+const corridor: FloorSpace = { id: "corridor-west", kind: "corridor" }
 const excluded: FloorSpace = { id: "south-excluded", kind: "excluded" }
 
 describe("isNamedSpace", () => {

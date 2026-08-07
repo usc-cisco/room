@@ -172,6 +172,42 @@
   );
 }
 
+/* The floor plate is stored landscape — the plan turned a quarter turn — and
+   turned back to the plan's own north-up orientation below `md`, where a
+   landscape plate cannot fit without scrolling sideways.
+
+   Both placements ride on each block as custom properties so the switch is pure
+   CSS. The alternative, a media-query hook, would have to reconcile after
+   hydration; a second copy of the plate would duplicate every room button in
+   the accessibility tree.
+
+   48rem is `md`, and has to stay in step with the `md:` classes on the plate. */
+@layer components {
+  .plate {
+    grid-template-columns: var(--plate-columns);
+    grid-template-rows: var(--plate-rows);
+    aspect-ratio: var(--plate-aspect);
+  }
+
+  .plate-block {
+    grid-column: var(--block-column);
+    grid-row: var(--block-row);
+  }
+
+  @media (width < 48rem) {
+    .plate {
+      grid-template-columns: var(--plate-columns-portrait);
+      grid-template-rows: var(--plate-rows-portrait);
+      aspect-ratio: var(--plate-aspect-portrait);
+    }
+
+    .plate-block {
+      grid-column: var(--block-column-portrait);
+      grid-row: var(--block-row-portrait);
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

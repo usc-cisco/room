@@ -25,9 +25,15 @@ export interface FloorSpace {
   kind: CellKind
 }
 
-/** A block stacked inside a `stack` cell; it inherits its position. */
+/**
+ * A block stacked inside a `stack` cell; it inherits its position.
+ *
+ * `weight` is the block's depth in plan units, so a stack keeps the proportions
+ * the plan draws instead of dividing its run evenly.
+ */
 export type StackBlock = FloorSpace & {
   kind: "room" | "comfort" | "excluded"
+  weight: number
 }
 
 /** A block placed directly on the shared grid. */

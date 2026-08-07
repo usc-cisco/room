@@ -6,6 +6,7 @@ import {
   FLOOR_SPACES,
   GRID_COLUMNS,
   NAMED_SPACES,
+  PLATE_ASPECT,
   ROW_TRACKS,
 } from "@/lib/floor-plan/data"
 
@@ -75,6 +76,27 @@ describe("floor plan data", () => {
         NAMED_SPACES.some((space) => space.id === id),
         id
       ).toBe(true)
+    }
+  })
+
+  // The whole point of the plate is that one plan unit is the same size across
+  // as it is down. That only holds while the pinned aspect ratio agrees with
+  // the tracks, so pin the agreement rather than the numbers.
+  test("the plate's aspect ratio matches its row tracks", () => {
+    const depth = ROW_TRACKS.reduce(
+      (total, track) => total + Number.parseFloat(track),
+      0
+    )
+
+    expect(PLATE_ASPECT.height).toBe(depth)
+    expect(PLATE_ASPECT.width / GRID_COLUMNS).toBe(37.5)
+  })
+
+  test("every stacked block carries a weight", () => {
+    for (const cell of FLOOR_CELLS) {
+      for (const child of cell.children ?? []) {
+        expect(child.weight, child.id).toBeGreaterThan(0)
+      }
     }
   })
 
