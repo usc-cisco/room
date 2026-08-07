@@ -109,7 +109,7 @@ export const schedule = sqliteTable(
      * The `id` of a space in the static floor plan (e.g. `lb445`, `control`),
      * not a foreign key — rooms live in `src/lib/floor-plan/data.ts`, not the
      * database, so SQLite cannot enforce this. Validate it against
-     * `FLOOR_ROOMS` at the write boundary.
+     * `CLASS_ROOMS` at the write boundary.
      */
     roomId: text("room_id").notNull(),
 

@@ -1,4 +1,4 @@
-import { FLOOR_ROOMS } from "@/lib/floor-plan/data"
+import { CLASS_ROOMS } from "@/lib/floor-plan/data"
 
 /** A validated row, shaped for insertion into the `schedule` table. */
 export interface ScheduleInput {
@@ -85,15 +85,18 @@ export function parseTime(value: string): string | null {
 
 /**
  * Resolves a room reference to a floor-plan space id, accepting either the id
- * (`lb445`) or the code shown on the map (`LB445`). Returns null when the room
- * is not on the plan — the database cannot catch this, since rooms are static
- * data rather than a table.
+ * (`lb445`) or the code shown on the map (`LB445`).
+ *
+ * Only teaching rooms match: a class cannot be held in a comfort room, the
+ * Control Room or the Department Office, so a CSV naming one of those is an
+ * error worth reporting. The database cannot catch any of this, since rooms
+ * are static data rather than a table.
  */
 export function resolveRoomId(value: string): string | null {
   const raw = value.trim().toLowerCase()
   if (!raw) return null
 
-  const room = FLOOR_ROOMS.find(
+  const room = CLASS_ROOMS.find(
     (candidate) =>
       candidate.id.toLowerCase() === raw ||
       candidate.code?.toLowerCase() === raw

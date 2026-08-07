@@ -1,10 +1,19 @@
 import { describe, expect, test } from "bun:test"
 
-import { findRooms, isSelectable, matchesQuery } from "@/lib/floor-plan/search"
+import {
+  findRooms,
+  isClassRoom,
+  isNamedSpace,
+  matchesQuery,
+} from "@/lib/floor-plan/search"
 import type { FloorSpace } from "@/lib/floor-plan/types"
 
 const room: FloorSpace = { id: "lb445", code: "LB445", kind: "room" }
-const named: FloorSpace = { id: "control", name: "Control Room", kind: "room" }
+const facility: FloorSpace = {
+  id: "control",
+  name: "Control Room",
+  kind: "facility",
+}
 const comfort: FloorSpace = {
   id: "cr-a-west",
   name: "Comfort Room",
@@ -13,15 +22,32 @@ const comfort: FloorSpace = {
 const corridor: FloorSpace = { id: "corridor-north", kind: "corridor" }
 const excluded: FloorSpace = { id: "south-excluded", kind: "excluded" }
 
-describe("isSelectable", () => {
-  test("rooms and comfort rooms are selectable", () => {
-    expect(isSelectable(room)).toBe(true)
-    expect(isSelectable(comfort)).toBe(true)
+describe("isNamedSpace", () => {
+  test("rooms, comfort rooms and facilities all carry labels", () => {
+    expect(isNamedSpace(room)).toBe(true)
+    expect(isNamedSpace(comfort)).toBe(true)
+    expect(isNamedSpace(facility)).toBe(true)
   })
 
-  test("corridors and excluded floor area are not", () => {
-    expect(isSelectable(corridor)).toBe(false)
-    expect(isSelectable(excluded)).toBe(false)
+  test("corridors and excluded floor area do not", () => {
+    expect(isNamedSpace(corridor)).toBe(false)
+    expect(isNamedSpace(excluded)).toBe(false)
+  })
+})
+
+describe("isClassRoom", () => {
+  test("only teaching rooms hold classes", () => {
+    expect(isClassRoom(room)).toBe(true)
+  })
+
+  test("comfort rooms and facilities do not", () => {
+    expect(isClassRoom(comfort)).toBe(false)
+    expect(isClassRoom(facility)).toBe(false)
+  })
+
+  test("neither do corridors or excluded floor area", () => {
+    expect(isClassRoom(corridor)).toBe(false)
+    expect(isClassRoom(excluded)).toBe(false)
   })
 })
 
@@ -36,7 +62,7 @@ describe("matchesQuery", () => {
   })
 
   test("matches a name", () => {
-    expect(matchesQuery(named, "control")).toBe(true)
+    expect(matchesQuery(facility, "control")).toBe(true)
     expect(matchesQuery(comfort, "comfort")).toBe(true)
   })
 
@@ -77,6 +103,15 @@ describe("findRooms", () => {
 
     expect(found.length).toBeGreaterThan(0)
     expect(found.every((space) => space.kind === "comfort")).toBe(true)
+  })
+
+  // Facilities never open a schedule, but they are still worth locating on
+  // the plate, so search must keep reaching them.
+  test("finds facilities by name", () => {
+    expect(findRooms("control").map((found) => found.id)).toEqual(["control"])
+    expect(findRooms("department office").map((found) => found.id)).toEqual([
+      "department",
+    ])
   })
 
   test("returns nothing for an empty query", () => {

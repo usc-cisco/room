@@ -10,9 +10,13 @@ const cellVariants = cva(
   {
     variants: {
       kind: {
+        // The only interactive kind, so the only one carrying hover, focus and
+        // lift affordances.
         room: "bg-card text-card-foreground ring-1 ring-foreground/12 hover:ring-primary/60 focus-visible:ring-2 focus-visible:ring-ring motion-safe:hover:-translate-y-px",
-        comfort:
-          "bg-primary/10 text-primary ring-1 ring-primary/25 hover:bg-primary/20 hover:ring-primary/60 focus-visible:ring-2 focus-visible:ring-ring",
+        // Labelled but inert: no timetable sits behind either of these, so they
+        // deliberately offer nothing to click.
+        comfort: "bg-primary/10 text-primary ring-1 ring-primary/25",
+        facility: "bg-muted text-muted-foreground ring-1 ring-border",
         // Circulation, not a destination: no border, sits below the page.
         corridor: "bg-map-corridor",
         excluded: "hatch ring-1 ring-border",
@@ -44,10 +48,14 @@ interface MapCellProps {
 }
 
 /**
- * One block on the plate. Rooms and comfort rooms are buttons; corridors and
- * excluded floor area are inert and hidden from assistive tech — the legend
- * carries their meaning, and announcing two dozen unnamed shapes would bury
- * the rooms someone is actually tabbing for.
+ * One block on the plate.
+ *
+ * Only teaching rooms are buttons — they are the only spaces with a schedule
+ * to open. Comfort rooms and facilities still show their labels and still
+ * light up in search, but offer nothing to click and stay out of the tab
+ * order. Corridors and excluded floor area are additionally hidden from
+ * assistive tech: the legend carries their meaning, and announcing two dozen
+ * unnamed shapes would bury the rooms someone is actually tabbing for.
  */
 export function MapCell({
   space,
@@ -71,6 +79,24 @@ export function MapCell({
   }
 
   const isComfort = space.kind === "comfort"
+  const label = isComfort ? (
+    <>
+      <span aria-hidden="true" className="font-mono text-[0.625rem]">
+        CR
+      </span>
+      <span className="sr-only">Comfort Room</span>
+    </>
+  ) : (
+    <SpaceLabel space={space} />
+  )
+
+  if (space.kind !== "room") {
+    return (
+      <div className={classes} style={style}>
+        {label}
+      </div>
+    )
+  }
 
   return (
     <button
@@ -80,32 +106,30 @@ export function MapCell({
       className={classes}
       style={style}
     >
-      {isComfort ? (
-        <>
-          <span aria-hidden="true" className="font-mono text-[0.625rem]">
-            CR
-          </span>
-          <span className="sr-only">Comfort Room</span>
-        </>
-      ) : (
-        <>
-          {space.code ? (
-            <span className="font-mono text-xs font-medium tracking-tight">
-              {space.code}
-            </span>
-          ) : null}
-          {space.name ? (
-            <span
-              className={cn(
-                "text-[0.625rem] leading-tight text-balance",
-                space.code && "mt-0.5 opacity-70"
-              )}
-            >
-              {space.name}
-            </span>
-          ) : null}
-        </>
-      )}
+      {label}
     </button>
+  )
+}
+
+/** The code and/or name a space shows on the plate. */
+function SpaceLabel({ space }: { space: FloorSpace }) {
+  return (
+    <>
+      {space.code ? (
+        <span className="font-mono text-xs font-medium tracking-tight">
+          {space.code}
+        </span>
+      ) : null}
+      {space.name ? (
+        <span
+          className={cn(
+            "text-[0.625rem] leading-tight text-balance",
+            space.code && "mt-0.5 opacity-70"
+          )}
+        >
+          {space.name}
+        </span>
+      ) : null}
+    </>
   )
 }

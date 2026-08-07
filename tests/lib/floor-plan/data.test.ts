@@ -1,10 +1,11 @@
 import { describe, expect, test } from "bun:test"
 
 import {
+  CLASS_ROOMS,
   FLOOR_CELLS,
-  FLOOR_ROOMS,
   FLOOR_SPACES,
   GRID_COLUMNS,
+  NAMED_SPACES,
   ROW_TRACKS,
 } from "@/lib/floor-plan/data"
 
@@ -51,9 +52,29 @@ describe("floor plan data", () => {
     }
   })
 
-  test("every selectable space carries a code or a name", () => {
-    for (const room of FLOOR_ROOMS) {
-      expect(Boolean(room.code ?? room.name), room.id).toBe(true)
+  test("every named space carries a code or a name", () => {
+    for (const space of NAMED_SPACES) {
+      expect(Boolean(space.code ?? space.name), space.id).toBe(true)
+    }
+  })
+
+  test("every class room has a code", () => {
+    for (const room of CLASS_ROOMS) {
+      expect(Boolean(room.code), room.id).toBe(true)
+    }
+  })
+
+  // The plate's non-teaching spaces, pinned so that reclassifying one is a
+  // deliberate edit rather than an accident.
+  test("comfort rooms and facilities are not class rooms", () => {
+    const classIds = new Set(CLASS_ROOMS.map((room) => room.id))
+
+    for (const id of ["cr-a-west", "cr-a-east", "control", "department"]) {
+      expect(classIds.has(id), id).toBe(false)
+      expect(
+        NAMED_SPACES.some((space) => space.id === id),
+        id
+      ).toBe(true)
     }
   })
 

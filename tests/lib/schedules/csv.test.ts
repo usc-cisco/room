@@ -114,12 +114,19 @@ describe("resolveRoomId", () => {
   test("accepts the floor-plan id or the room code", () => {
     expect(resolveRoomId("lb445")).toBe("lb445")
     expect(resolveRoomId("LB445")).toBe("lb445")
-    expect(resolveRoomId("control")).toBe("control")
   })
 
   test("rejects rooms that are not on the plan", () => {
     expect(resolveRoomId("LB999")).toBeNull()
     expect(resolveRoomId("")).toBeNull()
+  })
+
+  // Classes are only ever held in teaching rooms, so naming one of the
+  // plate's other labelled spaces is an error the ingest should surface.
+  test("rejects spaces that do not hold classes", () => {
+    expect(resolveRoomId("control")).toBeNull()
+    expect(resolveRoomId("department")).toBeNull()
+    expect(resolveRoomId("cr-a-west")).toBeNull()
   })
 })
 

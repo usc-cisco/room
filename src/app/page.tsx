@@ -4,6 +4,7 @@ import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
 import { Container } from "@/components/layout/container"
 import { getSession } from "@/lib/auth/session"
+import { listSchedulesByRoom } from "@/lib/schedules/queries"
 
 export default async function Page() {
   const session = await getSession()
@@ -17,6 +18,7 @@ export default async function Page() {
   }
 
   const { user } = session
+  const schedulesByRoom = listSchedulesByRoom()
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -24,7 +26,7 @@ export default async function Page() {
 
       <main className="flex-1">
         <Container className="py-8 sm:py-12">
-          <FloorMap />
+          <FloorMap schedulesByRoom={schedulesByRoom} />
         </Container>
       </main>
 

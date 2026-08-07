@@ -1,4 +1,4 @@
-import type { FloorCell, FloorSpace, SelectableSpace } from "./types"
+import type { ClassRoom, FloorCell, FloorSpace, NamedSpace } from "./types"
 
 /**
  * The plate is laid out on a fixed 40-column grid so every band lines up on the
@@ -93,7 +93,7 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   {
     id: "control",
     name: "Control Room",
-    kind: "room",
+    kind: "facility",
     col: main(6),
     span: 4,
     row: 5,
@@ -134,7 +134,7 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   {
     id: "department",
     name: "Department Office",
-    kind: "room",
+    kind: "facility",
     col: main(2),
     span: 10,
     row: 7,
@@ -173,8 +173,15 @@ export const FLOOR_SPACES: readonly FloorSpace[] = FLOOR_CELLS.flatMap(
   (cell) => (cell.children ? [cell, ...cell.children] : [cell])
 )
 
-/** Every space a person can search for and select. */
-export const FLOOR_ROOMS: readonly SelectableSpace[] = FLOOR_SPACES.filter(
-  (space): space is SelectableSpace =>
-    space.kind === "room" || space.kind === "comfort"
+/** Every space carrying a label, so it can be searched for and highlighted. */
+export const NAMED_SPACES: readonly NamedSpace[] = FLOOR_SPACES.filter(
+  (space): space is NamedSpace =>
+    space.kind === "room" ||
+    space.kind === "comfort" ||
+    space.kind === "facility"
+)
+
+/** Every room that holds classes — the only kind that opens a schedule. */
+export const CLASS_ROOMS: readonly ClassRoom[] = FLOOR_SPACES.filter(
+  (space): space is ClassRoom => space.kind === "room"
 )
