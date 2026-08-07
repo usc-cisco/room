@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test"
 
 import {
   dayName,
+  formatClock,
+  formatLongDate,
   formatTime,
   formatTimeRange,
   isCurrent,
@@ -100,6 +102,33 @@ describe("isCurrent", () => {
     const broken = { dayOfWeek: 1, startTime: "oops", endTime: "12:30" }
 
     expect(isCurrent(broken, 1, 600)).toBe(false)
+  })
+})
+
+describe("formatLongDate", () => {
+  test("spells out the weekday and month", () => {
+    expect(formatLongDate(new Date(2026, 7, 7))).toBe("Friday, August 7, 2026")
+    expect(formatLongDate(new Date(2026, 0, 1))).toBe(
+      "Thursday, January 1, 2026"
+    )
+  })
+
+  test("does not zero-pad the day of the month", () => {
+    expect(formatLongDate(new Date(2026, 11, 25))).toBe(
+      "Friday, December 25, 2026"
+    )
+  })
+})
+
+describe("formatClock", () => {
+  test("renders a moment as a 12-hour time", () => {
+    expect(formatClock(new Date(2026, 7, 7, 13, 55))).toBe("1:55 PM")
+    expect(formatClock(new Date(2026, 7, 7, 7, 5))).toBe("7:05 AM")
+  })
+
+  test("handles midnight and noon", () => {
+    expect(formatClock(new Date(2026, 7, 7, 0, 0))).toBe("12:00 AM")
+    expect(formatClock(new Date(2026, 7, 7, 12, 0))).toBe("12:00 PM")
   })
 })
 

@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { CalendarOff } from "lucide-react"
 
 import {
@@ -10,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { useNow } from "@/hooks/use-now"
 import type { ClassRoom } from "@/lib/floor-plan/types"
 import {
   dayName,
@@ -19,9 +19,6 @@ import {
 } from "@/lib/schedules/format"
 import type { RoomSchedule } from "@/lib/schedules/types"
 import { cn } from "@/lib/utils"
-
-/** How often the "Now" marker is re-checked while the sheet stays open. */
-const TICK_MS = 60_000
 
 interface RoomSheetProps {
   room: ClassRoom | null
@@ -58,14 +55,9 @@ function RoomDay({
   room: ClassRoom
   schedules: readonly RoomSchedule[]
 }) {
-  const [now, setNow] = useState(() => new Date())
-
-  // Keeps the "Now" marker honest if the sheet is left open across a class
-  // changeover. Only runs while the sheet is mounted.
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), TICK_MS)
-    return () => clearInterval(timer)
-  }, [])
+  // Ticks while the sheet is open, so the "Now" marker stays honest across a
+  // class changeover. Also the seam the dev clock override plugs into.
+  const now = useNow()
 
   const today = now.getDay()
   const minutes = minutesOfDay(now)

@@ -6,6 +6,7 @@ import { CLASS_ROOMS } from "@/lib/floor-plan/data"
 import { findRooms } from "@/lib/floor-plan/search"
 import type { RoomScheduleMap } from "@/lib/schedules/types"
 
+import { CurrentTime } from "./current-time"
 import { MapGrid } from "./map-grid"
 import { RoomSearch } from "./room-search"
 import { RoomSheet } from "./room-sheet"
@@ -46,15 +47,8 @@ export function FloorMap({ schedulesByRoom }: FloorMapProps) {
   }, [])
 
   return (
-    <section aria-labelledby="floor-map-heading" className="grid gap-5">
-      <header className="grid gap-1">
-        <h1 id="floor-map-heading" className="font-heading text-lg font-medium">
-          Floor map
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Find a room in the department.
-        </p>
-      </header>
+    <section aria-label="Floor map" className="grid gap-5">
+      <CurrentTime />
 
       <div className="grid min-w-0 gap-3">
         <RoomSearch
