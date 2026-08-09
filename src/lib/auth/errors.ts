@@ -15,3 +15,20 @@ export class UnauthorizedError extends Error {
     this.name = "UnauthorizedError"
   }
 }
+
+/**
+ * Refused for going too fast.
+ *
+ * Carries the wait so a caller can say *how long* rather than just *no* — a
+ * page can count it down, and a route handler can put it in `Retry-After`.
+ */
+export class RateLimitedError extends Error {
+  /** Seconds until the caller may try again. */
+  readonly retryAfter: number
+
+  constructor(retryAfter: number, message = "Too many requests.") {
+    super(message)
+    this.name = "RateLimitedError"
+    this.retryAfter = retryAfter
+  }
+}

@@ -8,7 +8,9 @@ import { asc } from "drizzle-orm"
 
 import { db } from "@/db"
 import { schedule } from "@/db/schema"
+import { RateLimitedError } from "@/lib/auth/errors"
 import { requireSession } from "@/lib/auth/session"
+import { PAGE_READS, rateLimit } from "@/lib/rate-limit"
 
 import type { RoomSchedule, RoomScheduleMap } from "./types"
 
@@ -63,9 +65,17 @@ function groupByRoom(schedules: readonly RoomSchedule[]): RoomScheduleMap {
  * the department's week. The session is resolved here rather than by the caller
  * so that a page, a route handler or an action written later cannot read it by
  * forgetting to ask.
+ *
+ * The budget is spent per user rather than per request source: a signed-in
+ * account is the thing being held to a rate, and it survives a change of
+ * network. Reading the whole table is cheap but not free, and this is the only
+ * query the app makes.
  */
 export async function listSchedulesByRoom(): Promise<RoomScheduleMap> {
-  await requireSession()
+  const { user } = await requireSession()
+
+  const decision = rateLimit(`page-reads:${user.id}`, PAGE_READS)
+  if (!decision.ok) throw new RateLimitedError(decision.retryAfter)
 
   return groupByRoom(listSchedules())
 }
