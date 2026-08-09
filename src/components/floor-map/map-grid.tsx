@@ -25,7 +25,7 @@ interface MapGridProps {
   onSelect: (id: string) => void
 }
 
-/** Equal tracks along the plate's 38-column axis, whichever way it is turned. */
+/** Equal tracks along the plate's 32-column axis, whichever way it is turned. */
 const EQUAL_TRACKS = `repeat(${GRID_COLUMNS}, minmax(0, 1fr))`
 
 /**
@@ -95,54 +95,22 @@ export function MapGrid({
   }
 
   return (
-    <div className="overflow-x-auto overscroll-x-contain">
-      <div
-        role="group"
-        aria-label="Department floor map"
-        // Portrait is a tall shape, so the plate caps its width and centres
-        // rather than growing into a very long column on a small tablet.
-        //
-        // The outer wall is a border, not a ring: a ring spreads outside the
-        // border box and the scroll container clips it away at both edges.
-        className="plate grid gap-0.5 border border-foreground/25 bg-background p-2.5 max-md:mx-auto max-md:max-w-[26rem] sm:p-3 md:min-w-[38rem]"
-        style={PLATE_STYLE}
-      >
-        <OccupancyKey />
+    <div className="grid gap-1.5">
+      <OccupancyKey />
 
-        {FLOOR_CELLS.map((cell) => {
-          const style = blockStyle(cell)
-
-          if (cell.kind === "stack" && cell.children) {
-            return (
-              <div
-                key={cell.id}
-                // The stack runs along the plate's measured axis, which the
-                // transpose moves from vertical to horizontal.
-                className="plate-block flex flex-row gap-0.5 md:flex-col"
-                style={style}
-              >
-                {cell.children.map((child) => (
-                  <MapCell
-                    key={child.id}
-                    space={child}
-                    occupied={occupiedIds.has(child.id)}
-                    selected={child.id === selectedId}
-                    state={stateFor(child)}
-                    onSelect={onSelect}
-                    // Each block takes the share of the run its measured
-                    // depth earns rather than an equal slice. `flexBasis: 0`
-                    // is what makes the weights read as proportions: left on
-                    // `auto`, a block would first take its content's size
-                    // and only then share out what was left. Both follow the
-                    // main axis, so this holds whichever way the stack runs.
-                    style={{ flexGrow: child.weight, flexBasis: 0 }}
-                  />
-                ))}
-              </div>
-            )
-          }
-
-          return (
+      <div className="overflow-x-auto overscroll-x-contain">
+        <div
+          role="group"
+          aria-label="Department floor map"
+          // Portrait is a tall shape, so the plate caps its width and centres
+          // rather than growing into a very long column on a small tablet.
+          //
+          // The outer wall is a border, not a ring: a ring spreads outside the
+          // border box and the scroll container clips it away at both edges.
+          className="plate grid gap-0.5 border border-foreground/25 bg-background p-2.5 max-md:mx-auto max-md:max-w-[26rem] sm:p-3 md:min-w-[38rem]"
+          style={PLATE_STYLE}
+        >
+          {FLOOR_CELLS.map((cell) => (
             <MapCell
               key={cell.id}
               space={cell}
@@ -151,10 +119,10 @@ export function MapGrid({
               state={stateFor(cell)}
               onSelect={onSelect}
               className="plate-block"
-              style={style}
+              style={blockStyle(cell)}
             />
-          )
-        })}
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -163,24 +131,22 @@ export function MapGrid({
 /**
  * Says what the red tint means.
  *
- * Sits in the corner of the plate that is open ground on the plan — the south
- * wing starts three tracks in and the corridor spine a track after that — so it
- * costs no space in either orientation and travels with the plan rather than
- * floating over it.
+ * Sits above the plate rather than in it: it is a note about the drawing, not
+ * part of the floor, and outside the plate it neither has to find a corner that
+ * is open ground in both orientations nor scales down with the blocks.
  */
 function OccupancyKey() {
   return (
-    <div
-      className="plate-block flex items-center gap-1.5 place-self-start"
-      style={blockStyle({ col: 1, span: 5, row: 1, rowSpan: 3 })}
-    >
+    // Held to the plate's own measure below `md`, where the plate centres
+    // itself, so the key starts on the same edge as the drawing it explains.
+    <div className="flex items-center gap-1.5 max-md:mx-auto max-md:w-full max-md:max-w-[26rem]">
       {/* Same tokens as an occupied cell, so the key and the thing it explains
           cannot drift apart. */}
       <span
         aria-hidden="true"
         className="size-3 shrink-0 bg-destructive/10 ring-1 ring-destructive/40"
       />
-      <span className="text-[0.625rem] leading-tight text-muted-foreground">
+      <span className="text-xs leading-tight text-muted-foreground">
         In use now
       </span>
     </div>

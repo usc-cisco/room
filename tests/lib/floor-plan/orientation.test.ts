@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test"
 
-import { FLOOR_CELLS, GRID_COLUMNS, ROW_TRACKS } from "@/lib/floor-plan/data"
+import {
+  FLOOR_CELLS,
+  GRID_COLUMNS,
+  PLATE_ASPECT,
+  ROW_TRACKS,
+} from "@/lib/floor-plan/data"
 import {
   landscapePlacement,
   portraitPlacement,
@@ -45,7 +50,7 @@ describe("portraitPlacement", () => {
   test("turns a west wing room onto the wing's column", () => {
     expect(portraitPlacement(cell("lb448"))).toEqual({
       column: "5 / span 1",
-      row: "5 / span 4",
+      row: "4 / span 4",
     })
   })
 
@@ -54,15 +59,16 @@ describe("portraitPlacement", () => {
   test("lays the north spine along the top", () => {
     const placed = portraitPlacement(cell("corridor-spine-north"))
 
-    expect(placed).toEqual({ column: "4 / span 8", row: "1 / span 2" })
+    expect(placed).toEqual({ column: "4 / span 8", row: "1 / span 1" })
   })
 
-  // The south wing runs along the bottom of the plan, which is what the stack
-  // has to become once the plate is turned back.
-  test("lays the south wing along the bottom", () => {
-    expect(portraitPlacement(cell("west-wing"))).toEqual({
-      column: "4 / span 5",
-      row: "35 / span 4",
+  // The plan's southern corridor: the opposite edge from the north spine, and
+  // the full depth of the plate, so turning it back must lay it along the
+  // bottom rather than beside anything.
+  test("lays the south spine along the bottom", () => {
+    expect(portraitPlacement(cell("corridor-spine-south"))).toEqual({
+      column: "1 / span 11",
+      row: "32 / span 1",
     })
   })
 
@@ -118,7 +124,7 @@ describe("portraitPlacement", () => {
 describe("PORTRAIT_ASPECT", () => {
   // Turning the plate must not stretch it, or the rooms stop being to scale.
   test("is the plate's aspect on its side", () => {
-    expect(PORTRAIT_ASPECT.width).toBe(816)
-    expect(PORTRAIT_ASPECT.height).toBe(GRID_COLUMNS * 37.5)
+    expect(PORTRAIT_ASPECT.width).toBe(PLATE_ASPECT.height)
+    expect(PORTRAIT_ASPECT.height).toBe(PLATE_ASPECT.width)
   })
 })

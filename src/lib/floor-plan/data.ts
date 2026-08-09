@@ -1,4 +1,4 @@
-import type { ClassRoom, FloorCell, FloorSpace, NamedSpace } from "./types"
+import type { ClassRoom, FloorCell, NamedSpace } from "./types"
 
 /**
  * The plate is traced off the posted evacuation plan, and every room size here
@@ -8,59 +8,64 @@ import type { ClassRoom, FloorCell, FloorSpace, NamedSpace } from "./types"
  *
  * 1. The map is the plan turned a quarter turn clockwise, so it reads landscape
  *    on a screen. The plan's three north–south wings become the map's three
- *    horizontal bands, and the plan's south wing becomes the map's west column.
- *    Following from that, a wing's *north* end is the map's *right* edge.
+ *    horizontal bands. Following from that, a wing's *north* end is the map's
+ *    *right* edge.
  * 2. One grid column is 37.5 plan units, which is a quarter of a classroom.
  *    So a classroom is 4 columns, a half-room 2, and a comfort room 2.
  *
- * `ROW_TRACKS` needs no such conversion: the tracks are `fr` values holding the
- * measured depths directly, so the two axes stay on one scale.
+ * `ROW_TRACKS` needs no such conversion: the tracks are `fr` values in those
+ * same plan units, so the two axes stay on one scale.
  */
-export const GRID_COLUMNS = 38
+export const GRID_COLUMNS = 32
 
 /**
- * Row tracks, north to south, each holding its measured depth on the plan —
- * except the open bands, which are drawn at corridor width.
+ * Row tracks, north to south. Rooms hold their measured depth on the plan; the
+ * corridors and the open bands do not.
  *
  * The plan's courtyard is genuinely wider than a classroom, and at true size it
  * left a third of the map empty and pushed the wings too far apart to take in
- * at once. Compressing only the voids is what keeps every *room* honest: the
- * plate's height is compressed by the same amount (see `PLATE_ASPECT`), so one
- * plan unit stays the same size across as it is down.
+ * at once. Compressing only what carries no room is what keeps every *room*
+ * honest: the plate's height is compressed by the same amount (see
+ * `PLATE_ASPECT`), so one plan unit stays the same size across as it is down.
+ *
+ * Corridors are all drawn one column wide — 37.5 units, against measured depths
+ * of 49 to 54 — which is what lets the spines match them exactly, a spine being
+ * a column rather than a track. Circulation then reads as one width everywhere
+ * instead of four that differ by a hair, and the rooms it serves carry the
+ * variation the plan actually has.
  */
 export const ROW_TRACKS = [
-  "117fr", // 1  LB442–LB443B block
-  "52fr", //  2  its corridor
-  "50fr", //  3  open floor, compressed
-  "50fr", //  4  west wing corridor
-  "118fr", // 5  west wing rooms
-  "50fr", //  6  central open floor, compressed
-  "112fr", // 7  middle wing rooms
-  "54fr", //  8  its corridor
-  "50fr", //  9  open floor, compressed
-  "49fr", //  10 east wing corridor
-  "114fr", // 11 east wing rooms
+  "117fr", //  1  LB442–LB443A block
+  "37.5fr", // 2  its corridor
+  "24fr", //   3  open floor, compressed
+  "37.5fr", // 4  west wing corridor
+  "118fr", //  5  west wing rooms
+  "24fr", //   6  central open floor, compressed
+  "112fr", //  7  middle wing rooms
+  "37.5fr", // 8  its corridor
+  "24fr", //   9  open floor, compressed
+  "37.5fr", // 10 east wing corridor
+  "114fr", //  11 east wing rooms
 ] as const
 
 /**
- * The plate's proportions in plan units: 38 columns of 37.5 across, against the
+ * The plate's proportions in plan units: 32 columns of 37.5 across, against the
  * summed row tracks down. Pinning it is what holds one unit to one size on both
  * axes, and so what keeps rooms to scale at every width rather than at one.
  */
-export const PLATE_ASPECT = { width: GRID_COLUMNS * 37.5, height: 816 }
+export const PLATE_ASPECT = { width: GRID_COLUMNS * 37.5, height: 683 }
 
 /** Where the wings' rooms start, east of the corridor spine that serves them. */
-const RUN = 7
+const RUN = 2
 
 export const FLOOR_CELLS: readonly FloorCell[] = [
-  // ── LB442–LB443B block ─────────────────────────────────────────────────
-  // Detached from the rest of the floor, west across the open ground. LB443B is
-  // half the depth of the two beside it. The plan draws all three flush, so
-  // they share one row rather than staggering.
+  // ── LB442–LB443A block ─────────────────────────────────────────────────
+  // Detached from the rest of the floor, across the open ground. The plan draws
+  // the two flush, so they share one row rather than staggering.
   { id: "lb442", code: "LB442", kind: "room", col: RUN, span: 4, row: 1 },
   { id: "lb443a", code: "LB443A", kind: "room", col: RUN + 4, span: 4, row: 1 },
-  { id: "lb443b", code: "LB443B", kind: "room", col: RUN + 8, span: 2, row: 1 },
-  { id: "corridor-lb442s", kind: "corridor", col: RUN, span: 10, row: 2 },
+  // Serves the block and stops with it, at LB443A's far wall.
+  { id: "corridor-lb442s", kind: "corridor", col: RUN, span: 8, row: 2 },
 
   // ── West wing ──────────────────────────────────────────────────────────
   // Corridor on the outer face, then the rooms. Reading left to right is
@@ -94,25 +99,6 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     col: RUN + 28,
     span: 2,
     row: 5,
-  },
-
-  // ── South wing ─────────────────────────────────────────────────────────
-  // Runs across the bottom of the plan, so on the map it stands as the west
-  // column. Its divisions do not line up with the shared row tracks, so the
-  // blocks are stacked inside one cell and sized by their measured depths.
-  {
-    id: "west-wing",
-    kind: "stack",
-    col: 1,
-    span: 4,
-    row: 4,
-    rowSpan: 5,
-    children: [
-      { id: "lb400", code: "LB400", kind: "room", weight: 87 },
-      { id: "lb401", code: "LB401", kind: "room", weight: 126 },
-      { id: "lb402", code: "LB402", kind: "room", weight: 125 },
-      { id: "west-excluded", kind: "excluded", weight: 251 },
-    ],
   },
 
   // ── Middle wing ────────────────────────────────────────────────────────
@@ -164,7 +150,7 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   {
     id: "corridor-spine-south",
     kind: "corridor",
-    col: 6,
+    col: 1,
     span: 1,
     row: 1,
     rowSpan: 11,
@@ -172,27 +158,20 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   {
     id: "corridor-spine-north",
     kind: "corridor",
-    col: 37,
-    span: 2,
+    col: 32,
+    span: 1,
     row: 4,
     rowSpan: 8,
   },
 ]
 
-/** Every space on the plate, with stacked children lifted alongside the cells. */
-export const FLOOR_SPACES: readonly FloorSpace[] = FLOOR_CELLS.flatMap(
-  (cell) => (cell.children ? [cell, ...cell.children] : [cell])
-)
-
 /** Every space carrying a label, so it can be searched for and highlighted. */
-export const NAMED_SPACES: readonly NamedSpace[] = FLOOR_SPACES.filter(
-  (space): space is NamedSpace =>
-    space.kind === "room" ||
-    space.kind === "comfort" ||
-    space.kind === "facility"
+export const NAMED_SPACES: readonly NamedSpace[] = FLOOR_CELLS.filter(
+  (cell): cell is FloorCell & NamedSpace =>
+    cell.kind === "room" || cell.kind === "comfort" || cell.kind === "facility"
 )
 
 /** Every room that holds classes — the only kind that opens a schedule. */
-export const CLASS_ROOMS: readonly ClassRoom[] = FLOOR_SPACES.filter(
-  (space): space is ClassRoom => space.kind === "room"
+export const CLASS_ROOMS: readonly ClassRoom[] = FLOOR_CELLS.filter(
+  (cell): cell is FloorCell & ClassRoom => cell.kind === "room"
 )

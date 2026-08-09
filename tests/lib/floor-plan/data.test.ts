@@ -3,7 +3,6 @@ import { describe, expect, test } from "bun:test"
 import {
   CLASS_ROOMS,
   FLOOR_CELLS,
-  FLOOR_SPACES,
   GRID_COLUMNS,
   NAMED_SPACES,
   PLATE_ASPECT,
@@ -12,7 +11,7 @@ import {
 
 describe("floor plan data", () => {
   test("every space id is unique", () => {
-    const ids = FLOOR_SPACES.map((space) => space.id)
+    const ids = FLOOR_CELLS.map((cell) => cell.id)
 
     expect(new Set(ids).size).toBe(ids.length)
   })
@@ -90,34 +89,5 @@ describe("floor plan data", () => {
 
     expect(PLATE_ASPECT.height).toBe(depth)
     expect(PLATE_ASPECT.width / GRID_COLUMNS).toBe(37.5)
-  })
-
-  test("every stacked block carries a weight", () => {
-    for (const cell of FLOOR_CELLS) {
-      for (const child of cell.children ?? []) {
-        expect(child.weight, child.id).toBeGreaterThan(0)
-      }
-    }
-  })
-
-  test("only stack cells have children", () => {
-    for (const cell of FLOOR_CELLS) {
-      if (cell.children) {
-        expect(cell.kind).toBe("stack")
-        expect(cell.children.length).toBeGreaterThan(0)
-      } else {
-        expect(cell.kind).not.toBe("stack")
-      }
-    }
-  })
-
-  test("stacked children are lifted into the flattened spaces", () => {
-    const stacked = FLOOR_CELLS.flatMap((cell) => cell.children ?? [])
-    const flatIds = new Set(FLOOR_SPACES.map((space) => space.id))
-
-    expect(stacked.length).toBeGreaterThan(0)
-    for (const child of stacked) {
-      expect(flatIds.has(child.id)).toBe(true)
-    }
   })
 })

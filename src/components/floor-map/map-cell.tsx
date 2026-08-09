@@ -6,7 +6,12 @@ import type { FloorSpace } from "@/lib/floor-plan/types"
 import { cn } from "@/lib/utils"
 
 const cellVariants = cva(
-  "relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-none px-px text-center outline-none motion-safe:transition-[opacity,box-shadow,transform,background-color] motion-safe:duration-150 md:px-1",
+  // A size container, so a label can be fitted to the block it sits in rather
+  // than to the plate: the same block is wide and shallow in one orientation
+  // and narrow and deep in the other. Containment costs nothing here — every
+  // block is sized by its grid track or its flex weight, so its contents never
+  // contributed to its size to begin with.
+  "[container-type:size] relative flex min-w-0 flex-col items-center justify-center overflow-hidden rounded-none px-px text-center outline-none motion-safe:transition-[opacity,box-shadow,transform,background-color] motion-safe:duration-150 md:px-1",
   {
     variants: {
       kind: {
@@ -18,9 +23,15 @@ const cellVariants = cva(
         comfort: "bg-primary/10 text-primary ring-1 ring-primary/25",
         facility: "bg-muted text-muted-foreground ring-1 ring-border",
         // Circulation, not a destination: no border, sits below the page.
-        corridor: "bg-map-corridor",
+        //
+        // The ring is how the spines join the bands they meet. Grid gaps are
+        // the plan's walls, but two corridors meeting have no wall between
+        // them, and a slit of page showing through read as one. A ring spreads
+        // outside the border box without taking part in layout, so half a gap
+        // of corridor on each side closes the seam and nothing on the plate
+        // moves.
+        corridor: "bg-map-corridor ring-1 ring-map-corridor",
         excluded: "hatch ring-1 ring-border",
-        stack: "gap-1 bg-transparent p-0",
       },
       // Declared after `kind` so it overrides the room surface, and before
       // `selected`/`state` so both of those still win over it.
@@ -124,21 +135,40 @@ export function MapCell({
   )
 }
 
+/** Characters in the longest word — the width a wrapping name has to fit. */
+function longestWord(name: string): number {
+  return name
+    .split(/\s+/)
+    .reduce((longest, word) => Math.max(longest, word.length), 0)
+}
+
 /** The code and/or name a space shows on the plate. */
 function SpaceLabel({ space }: { space: FloorSpace }) {
   return (
     <>
       {space.code ? (
-        <span className="max-w-full font-mono text-[0.625rem] font-medium tracking-tight break-all md:text-xs">
+        <span
+          // A code is one token, never broken across lines: it shrinks to the
+          // block instead, and turns with it when the block is too narrow for
+          // any size to fit.
+          className="plate-label max-w-full font-mono font-medium tracking-tight whitespace-nowrap [--label-advance:0.66] [--label-size:0.625rem] md:[--label-size:0.75rem]"
+          style={{ "--label-chars": space.code.length } as React.CSSProperties}
+        >
           {space.code}
         </span>
       ) : null}
       {space.name ? (
         <span
           className={cn(
-            "max-w-full text-[0.625rem] leading-tight text-balance break-words",
+            // A name is prose: it wraps between words, so only its longest word
+            // has to fit across. Breaking inside a word is left off for that
+            // reason — `Contro` over `l Room` is worse than a smaller label.
+            "plate-label max-w-full leading-tight text-balance [--label-advance:0.58]",
             space.code && "mt-0.5 opacity-70"
           )}
+          style={
+            { "--label-chars": longestWord(space.name) } as React.CSSProperties
+          }
         >
           {space.name}
         </span>

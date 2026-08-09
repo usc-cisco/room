@@ -7,11 +7,8 @@
  *                Department Office: searchable, but has no class schedule
  * - `corridor` — circulation space, drawn but not interactive
  * - `excluded` — floor area that is not part of the department
- * - `stack`    — a wrapper that divides its own cell into a vertical run of
- *                blocks, for wings that do not line up with the shared rows
  */
-export type CellKind =
-  "room" | "comfort" | "facility" | "corridor" | "excluded" | "stack"
+export type CellKind = "room" | "comfort" | "facility" | "corridor" | "excluded"
 
 /** What a block on the plate is, independent of where it sits. */
 export interface FloorSpace {
@@ -25,18 +22,7 @@ export interface FloorSpace {
   kind: CellKind
 }
 
-/**
- * A block stacked inside a `stack` cell; it inherits its position.
- *
- * `weight` is the block's depth in plan units, so a stack keeps the proportions
- * the plan draws instead of dividing its run evenly.
- */
-export type StackBlock = FloorSpace & {
-  kind: "room" | "comfort" | "excluded"
-  weight: number
-}
-
-/** A block placed directly on the shared grid. */
+/** A block placed on the grid. */
 export interface FloorCell extends FloorSpace {
   /** 1-based grid column the cell starts on. */
   col: number
@@ -46,8 +32,6 @@ export interface FloorCell extends FloorSpace {
   row: number
   /** How many row tracks the cell covers. Defaults to 1. */
   rowSpan?: number
-  /** Blocks stacked vertically inside this cell. Only `stack` cells use it. */
-  children?: readonly StackBlock[]
 }
 
 /**

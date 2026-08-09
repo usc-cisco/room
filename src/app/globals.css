@@ -206,6 +206,50 @@
       grid-row: var(--block-row-portrait);
     }
   }
+
+  /* A label is set to the width its own block has, not to one size that happens
+     to suit the widest of them. Blocks on the plate range from a quarter-room
+     to a whole wing, and a fixed size breaks the narrow ones mid-word — `LB443`
+     over `B`, which reads as two rooms, or `Contro` over `l Room`.
+
+     `--label-chars` is what has to fit across: a code is one unbreakable token,
+     so all of it; a name may wrap between words, so its longest word.
+     `--label-advance` is the face's advance width per character plus a little
+     slack. The floor keeps the smallest blocks from bottoming out at an
+     unreadable size, and `--label-size` is the ceiling it starts from. */
+  .plate-label {
+    font-size: clamp(
+      0.5rem,
+      calc(100cqi / (var(--label-chars, 5) * var(--label-advance))),
+      var(--label-size, 0.625rem)
+    );
+  }
+
+  /* Blocks far taller than they are wide read their label *down* the block
+     instead. Portrait turns the south wing's rooms on their ends — they are a
+     third as wide as they are deep — and no font size fits a code across those:
+     shrinking to fit would land near 6px. Turned, the label follows the room's
+     long axis and stays at full size, which is how a floor plan letters a
+     narrow room anyway.
+
+     Asked of the block itself rather than of the viewport, so it holds in both
+     orientations and needs no list of which blocks are narrow. */
+  @container (max-width: 4rem) and (max-aspect-ratio: 1 / 2) {
+    .plate-label {
+      writing-mode: vertical-rl;
+      /* Same fit, now against the axis the label runs along. The block is at
+         least twice as deep as it is wide in here, so that axis is whichever of
+         the two is longer — asked for that way because engines disagree on
+         which of `cqi`/`cqb` follows a turned element. */
+      font-size: clamp(
+        0.5rem,
+        calc(
+          max(100cqi, 100cqb) / (var(--label-chars, 5) * var(--label-advance))
+        ),
+        var(--label-size, 0.625rem)
+      );
+    }
+  }
 }
 
 @layer base {

@@ -91,10 +91,13 @@ describe("findRooms", () => {
   })
 
   test("finds every room sharing a code prefix", () => {
-    expect(findRooms("LB40").map((found) => found.code)).toEqual([
-      "LB400",
-      "LB401",
-      "LB402",
+    expect(findRooms("LB44").map((found) => found.code)).toEqual([
+      "LB442",
+      "LB443A",
+      "LB445",
+      "LB446",
+      "LB447",
+      "LB448",
     ])
   })
 
