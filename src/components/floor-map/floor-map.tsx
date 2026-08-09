@@ -1,7 +1,9 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
+import { DoorOpen } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import { useHydrated } from "@/hooks/use-hydrated"
 import { useNow } from "@/hooks/use-now"
 import { CLASS_ROOMS } from "@/lib/floor-plan/data"
@@ -11,6 +13,7 @@ import { occupiedRoomIds } from "@/lib/schedules/occupancy"
 import type { RoomScheduleMap } from "@/lib/schedules/types"
 
 import { CurrentTime } from "./current-time"
+import { FreeRoomsSheet } from "./free-rooms-sheet"
 import { MapGrid } from "./map-grid"
 import { RoomSearch } from "./room-search"
 import { RoomSheet } from "./room-sheet"
@@ -33,6 +36,7 @@ const NO_ROOMS: ReadonlySet<string> = new Set()
 export function FloorMap({ schedulesByRoom }: FloorMapProps) {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [freeOpen, setFreeOpen] = useState(false)
 
   const now = useNow()
 
@@ -71,17 +75,38 @@ export function FloorMap({ schedulesByRoom }: FloorMapProps) {
     if (!open) setSelectedId(null)
   }, [])
 
+  // Picking a room out of the free-rooms list hands it to the plate: the list
+  // closes, the room's own day opens, and the plate marks where it is. Both
+  // sheets are the same panel to the reader, so only one is ever open.
+  const handleSelectFromList = useCallback((id: string) => {
+    setFreeOpen(false)
+    setSelectedId(id)
+  }, [])
+
   return (
     <section aria-label="Floor map" className="grid gap-5">
       <CurrentTime now={now} />
 
       <div className="grid min-w-0 gap-3">
-        <RoomSearch
-          query={query}
-          onQueryChange={setQuery}
-          matchCount={matches.length}
-          className="sm:max-w-xs"
-        />
+        {/* `items-start` lines the trigger up with the input rather than with
+            the match count beneath it — both are `h-8`. */}
+        <div className="flex items-start justify-between gap-2">
+          <RoomSearch
+            query={query}
+            onQueryChange={setQuery}
+            matchCount={matches.length}
+            className="min-w-0 flex-1 sm:max-w-xs"
+          />
+
+          {/* The one thing on this row that opens a view of the whole floor
+              rather than acting on the plate, so it sits opposite the search
+              and carries the brand colour. */}
+          <Button onClick={() => setFreeOpen(true)} aria-haspopup="dialog">
+            <DoorOpen data-icon="inline-start" />
+            Free rooms
+          </Button>
+        </div>
+
         <MapGrid
           query={query}
           occupiedIds={occupiedIds}
@@ -95,6 +120,14 @@ export function FloorMap({ schedulesByRoom }: FloorMapProps) {
         now={now}
         schedules={selectedId ? (schedulesByRoom[selectedId] ?? []) : []}
         onOpenChange={handleOpenChange}
+      />
+
+      <FreeRoomsSheet
+        open={freeOpen}
+        onOpenChange={setFreeOpen}
+        schedulesByRoom={schedulesByRoom}
+        now={now}
+        onSelectRoom={handleSelectFromList}
       />
     </section>
   )

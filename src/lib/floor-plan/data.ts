@@ -35,7 +35,7 @@ export const GRID_COLUMNS = 32
  * variation the plan actually has.
  */
 export const ROW_TRACKS = [
-  "117fr", //  1  LB442–LB443A block
+  "117fr", //  1  LB442–LB443 block
   "37.5fr", // 2  its corridor
   "24fr", //   3  open floor, compressed
   "37.5fr", // 4  west wing corridor
@@ -59,12 +59,12 @@ export const PLATE_ASPECT = { width: GRID_COLUMNS * 37.5, height: 683 }
 const RUN = 2
 
 export const FLOOR_CELLS: readonly FloorCell[] = [
-  // ── LB442–LB443A block ─────────────────────────────────────────────────
+  // ── LB442–LB443 block ──────────────────────────────────────────────────
   // Detached from the rest of the floor, across the open ground. The plan draws
   // the two flush, so they share one row rather than staggering.
   { id: "lb442", code: "LB442", kind: "room", col: RUN, span: 4, row: 1 },
-  { id: "lb443a", code: "LB443A", kind: "room", col: RUN + 4, span: 4, row: 1 },
-  // Serves the block and stops with it, at LB443A's far wall.
+  { id: "lb443", code: "LB443", kind: "room", col: RUN + 4, span: 4, row: 1 },
+  // Serves the block and stops with it, at LB443's far wall.
   { id: "corridor-lb442s", kind: "corridor", col: RUN, span: 8, row: 2 },
 
   // ── West wing ──────────────────────────────────────────────────────────

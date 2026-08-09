@@ -209,8 +209,9 @@
 
   /* A label is set to the width its own block has, not to one size that happens
      to suit the widest of them. Blocks on the plate range from a quarter-room
-     to a whole wing, and a fixed size breaks the narrow ones mid-word — `LB443`
-     over `B`, which reads as two rooms, or `Contro` over `l Room`.
+     to a whole wing, and a fixed size breaks the narrow ones mid-word: a code
+     split across two lines reads as two rooms, and `Contro` over `l Room` reads
+     as neither.
 
      `--label-chars` is what has to fit across: a code is one unbreakable token,
      so all of it; a name may wrap between words, so its longest word.
