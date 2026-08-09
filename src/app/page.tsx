@@ -18,7 +18,7 @@ export default async function Page() {
   }
 
   const { user } = session
-  const schedulesByRoom = listSchedulesByRoom()
+  const schedulesByRoom = await listSchedulesByRoom()
 
   return (
     <div className="flex min-h-svh flex-col">

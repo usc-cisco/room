@@ -1,3 +1,7 @@
+// Holds the auth secret and the Google client secret by way of `env`, so a
+// client component reaching this should fail the build rather than ship them.
+import "server-only"
+
 import { drizzleAdapter } from "@better-auth/drizzle-adapter"
 import { betterAuth } from "better-auth"
 import { nextCookies } from "better-auth/next-js"

@@ -1,15 +1,16 @@
+// The marker rather than a comment saying the same: this module holds the
+// database client, so a client component importing it fails the build instead
+// of pulling better-sqlite3 into the browser. Client components take the shapes
+// from `./types`, which is free of both.
+import "server-only"
+
 import { asc } from "drizzle-orm"
 
 import { db } from "@/db"
 import { schedule } from "@/db/schema"
+import { requireSession } from "@/lib/auth/session"
 
 import type { RoomSchedule, RoomScheduleMap } from "./types"
-
-/**
- * Server-only: this module imports the database client, so importing any value
- * from it inside a client component would pull better-sqlite3 into the browser
- * bundle. Client components take the shapes from `./types` instead.
- */
 
 /**
  * Every meeting on the floor, in start order.
@@ -20,8 +21,12 @@ import type { RoomSchedule, RoomScheduleMap } from "./types"
  * so the client can decide what "today" is in the viewer's own timezone.
  *
  * Synchronous because the better-sqlite3 driver is.
+ *
+ * Unexported on purpose: this reads the table with nothing checked, so the only
+ * way out of this module is the gated function below. Exporting it would make
+ * the gate optional.
  */
-export function listSchedules(): RoomSchedule[] {
+function listSchedules(): RoomSchedule[] {
   return db
     .select({
       id: schedule.id,
@@ -40,9 +45,7 @@ export function listSchedules(): RoomSchedule[] {
 }
 
 /** Keys meetings by room id so the sheet can look one up without scanning. */
-export function groupByRoom(
-  schedules: readonly RoomSchedule[]
-): RoomScheduleMap {
+function groupByRoom(schedules: readonly RoomSchedule[]): RoomScheduleMap {
   const byRoom: RoomScheduleMap = {}
 
   for (const entry of schedules) {
@@ -53,7 +56,16 @@ export function groupByRoom(
   return byRoom
 }
 
-/** Every meeting on the floor, grouped by room, ready to hand to the map. */
-export function listSchedulesByRoom(): RoomScheduleMap {
+/**
+ * Every meeting on the floor, grouped by room, ready to hand to the map.
+ *
+ * The timetable is not public: who teaches what, where and when is a picture of
+ * the department's week. The session is resolved here rather than by the caller
+ * so that a page, a route handler or an action written later cannot read it by
+ * forgetting to ask.
+ */
+export async function listSchedulesByRoom(): Promise<RoomScheduleMap> {
+  await requireSession()
+
   return groupByRoom(listSchedules())
 }
