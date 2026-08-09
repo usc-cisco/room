@@ -1,13 +1,9 @@
-import Link from "next/link"
-import { TimerReset } from "lucide-react"
-
-import { SignInCard } from "@/components/auth/sign-in-card"
 import { FloorMap } from "@/components/floor-map/floor-map"
+import { LandingPage } from "@/components/landing/landing-page"
 import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
 import { Container } from "@/components/layout/container"
-import { PageStatus } from "@/components/layout/page-status"
-import { Button } from "@/components/ui/button"
+import { SlowDown } from "@/components/layout/slow-down"
 import { RateLimitedError } from "@/lib/auth/errors"
 import { getSession } from "@/lib/auth/session"
 import { listSchedulesByRoom } from "@/lib/schedules/queries"
@@ -17,11 +13,7 @@ export default async function Page() {
   const session = await getSession()
 
   if (!session) {
-    return (
-      <main className="grid min-h-svh place-items-center p-6">
-        <SignInCard />
-      </main>
-    )
+    return <LandingPage />
   }
 
   const { user } = session
@@ -42,9 +34,14 @@ export default async function Page() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <AppHeader name={user.name} email={user.email} image={user.image} />
+      <AppHeader user={user} />
 
-      <main className="flex-1">
+      <main className="relative isolate flex-1 overflow-hidden">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[min(30svh,18rem)] brand-glow opacity-50"
+        />
+
         <Container className="py-8 sm:py-12">
           <FloorMap schedulesByRoom={schedulesByRoom} />
         </Container>
@@ -52,28 +49,5 @@ export default async function Page() {
 
       <AppFooter />
     </div>
-  )
-}
-
-/**
- * Shown when this account has asked for the timetable too often.
- *
- * "Try again" is a plain link rather than a client reset: the page is a server
- * component, and a fresh request is exactly what is wanted once the window has
- * rolled over.
- */
-function SlowDown({ retryAfter }: { retryAfter: number }) {
-  return (
-    <main className="grid min-h-svh place-items-center p-6">
-      <PageStatus
-        icon={TimerReset}
-        title="Too many requests"
-        description={`This account has loaded the app a lot in the last minute. Try again in ${retryAfter} ${retryAfter === 1 ? "second" : "seconds"}.`}
-      >
-        <Button asChild>
-          <Link href="/">Try again</Link>
-        </Button>
-      </PageStatus>
-    </main>
   )
 }

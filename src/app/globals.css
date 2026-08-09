@@ -96,6 +96,12 @@
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
   --radius: 0.625rem;
+  /* Glow strength. A ceiling, not a taste: `--muted-foreground` clears AA on
+     the flat page by only 5.14:1, and at 34% the sign-in link measured 4.29:1.
+     Raising it means darkening `--muted-foreground` first. Stronger than dark
+     because the light primary is the darker of the two (L .5165 vs .62). */
+  --brand-glow-near: 26%;
+  --brand-glow-far: 9%;
   --sidebar: oklch(0.985 0.006 263.866);
   --sidebar-foreground: oklch(0.22 0.02 263.866);
   --sidebar-primary: oklch(0.5165 0.243 263.866);
@@ -140,6 +146,8 @@
   --accent: oklch(0.269 0.026 263.866);
   --accent-foreground: oklch(0.985 0.005 263.866);
   --destructive: oklch(0.704 0.191 22.216);
+  --brand-glow-near: 22%;
+  --brand-glow-far: 7%;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.62 0.204 263.866);
@@ -251,6 +259,19 @@
       );
     }
   }
+}
+
+/* The brand colour spilling down off the header. Mixed from `--primary` at
+   per-theme strengths, since the two primaries sit at different lightness. The
+   middle stop sits close to the last so the falloff is long and no band shows
+   across a gradient this wide. */
+@utility brand-glow {
+  background-image: radial-gradient(
+    75% 100% at 50% 0%,
+    color-mix(in oklab, var(--primary) var(--brand-glow-near), transparent) 0%,
+    color-mix(in oklab, var(--primary) var(--brand-glow-far), transparent) 45%,
+    transparent 100%
+  );
 }
 
 @layer base {
