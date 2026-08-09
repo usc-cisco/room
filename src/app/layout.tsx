@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
+import { DataNotice } from "@/components/layout/data-notice"
 import { ThemeProvider } from "@/components/theme-provider"
 import { env } from "@/lib/env"
 import { cn } from "@/lib/utils"
@@ -46,8 +47,20 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      {/* The body owns the viewport, not the pages: each shell below takes
+          `flex-1`, so the notice adds its height by shrinking the page rather
+          than by pushing it into a scroll. Zeroing `--chrome-inset-top` hands
+          the top safe area from the header to the notice above it. */}
+      <body
+        className={cn(
+          "flex min-h-svh flex-col",
+          env.showDataNotice && "[--chrome-inset-top:0px]"
+        )}
+      >
+        <ThemeProvider>
+          {env.showDataNotice ? <DataNotice /> : null}
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

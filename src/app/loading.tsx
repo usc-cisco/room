@@ -21,10 +21,10 @@ const PLATE_STYLE = {
 
 export default function Loading() {
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex flex-1 flex-col">
       {/* The header is brand blue at every stage, so it is drawn rather than
           skeletonised: a grey bar here would read as a different app. */}
-      <header className="border-b border-header-foreground/10 bg-header pt-[env(safe-area-inset-top)]">
+      <header className="border-b border-header-foreground/10 bg-header pt-[var(--chrome-inset-top)]">
         <Container className="flex items-center justify-between gap-3 py-3">
           <Skeleton className="h-4 w-28 bg-header-foreground/20 sm:h-5" />
           <div className="flex items-center gap-2">

@@ -16,7 +16,7 @@ interface SlowDownProps {
  */
 export function SlowDown({ retryAfter }: SlowDownProps) {
   return (
-    <main className="grid min-h-svh place-items-center p-6">
+    <main className="grid flex-1 place-items-center p-6">
       <PageStatus
         icon={TimerReset}
         title="Too many requests"

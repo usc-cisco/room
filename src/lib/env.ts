@@ -20,6 +20,9 @@ export const env = {
   /** Who someone refused by the allowlist should write to. Optional: with no
    *  address set, the refusal page simply does not offer one. */
   supportEmail: process.env.SUPPORT_EMAIL?.trim() || null,
+  /** Exact `"true"`, not a truthiness test: the classic env-flag bug is
+   *  `SHOW_DATA_NOTICE=false` switching the thing on. */
+  showDataNotice: process.env.SHOW_DATA_NOTICE?.trim().toLowerCase() === "true",
   authSecret: required("BETTER_AUTH_SECRET"),
   googleClientId: required("GOOGLE_CLIENT_ID"),
   googleClientSecret: required("GOOGLE_CLIENT_SECRET"),

@@ -25,7 +25,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ user }: AppHeaderProps) {
   return (
-    <header className="border-b border-header-foreground/10 bg-header pt-[env(safe-area-inset-top)] text-header-foreground">
+    <header className="border-b border-header-foreground/10 bg-header pt-[var(--chrome-inset-top)] text-header-foreground">
       <Container className="flex items-center justify-between gap-3 py-3">
         {/* Reads as "CISCO – room": the alt text supplies the first half, so
             assistive tech gets the whole name rather than a bare dash. */}

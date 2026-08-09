@@ -23,7 +23,7 @@ interface ErrorProps {
  */
 export default function Error({ error, reset }: ErrorProps) {
   return (
-    <main className="grid min-h-svh place-items-center p-6">
+    <main className="grid flex-1 place-items-center p-6">
       <PageStatus
         icon={TriangleAlert}
         title="The app did not load"

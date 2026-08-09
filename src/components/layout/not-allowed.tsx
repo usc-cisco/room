@@ -27,7 +27,7 @@ export function NotAllowed({ user }: NotAllowedProps) {
   const subject = encodeURIComponent(`room access for ${user.email}`)
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex flex-1 flex-col">
       <AppHeader user={user} />
 
       <main className="grid flex-1 place-items-center p-6">

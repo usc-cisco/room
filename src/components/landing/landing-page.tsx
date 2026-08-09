@@ -7,7 +7,7 @@ import { WhySignIn } from "./why-sign-in"
 
 export function LandingPage() {
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex flex-1 flex-col">
       <AppHeader />
 
       <main className="relative isolate grid flex-1 grid-rows-[1fr_auto_4fr] overflow-hidden">

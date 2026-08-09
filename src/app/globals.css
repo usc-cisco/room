@@ -28,6 +28,8 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -86,6 +88,12 @@
   --accent: oklch(0.945 0.012 263.866);
   --accent-foreground: oklch(0.22 0.02 263.866);
   --destructive: oklch(0.565 0.231 27.325);
+  /* The one non-brand hue in the palette. A disclaimer has to read as neither
+     the brand nor an error, and amber is the only colour that says "caution"
+     without saying "something broke". Surface and text are the same hue, so the
+     bar reads as one material. */
+  --warning: oklch(0.93 0.085 85);
+  --warning-foreground: oklch(0.4 0.09 85);
   --border: oklch(0.9 0.012 263.866);
   --input: oklch(0.9 0.012 263.866);
   /* Was oklch(0.708 0 0) = 2.59:1 on white, failing WCAG 1.4.11. */
@@ -96,6 +104,9 @@
   --chart-4: oklch(0.52 0.105 223.128);
   --chart-5: oklch(0.45 0.085 224.283);
   --radius: 0.625rem;
+  /* Whichever band is topmost owns the notch. The header claims it by default;
+     the layout zeroes this when the data notice sits above the header. */
+  --chrome-inset-top: env(safe-area-inset-top);
   /* Glow strength. A ceiling, not a taste: `--muted-foreground` clears AA on
      the flat page by only 5.14:1, and at 34% the sign-in link measured 4.29:1.
      Raising it means darkening `--muted-foreground` first. Stronger than dark
@@ -146,6 +157,8 @@
   --accent: oklch(0.269 0.026 263.866);
   --accent-foreground: oklch(0.985 0.005 263.866);
   --destructive: oklch(0.704 0.191 22.216);
+  --warning: oklch(0.29 0.055 85);
+  --warning-foreground: oklch(0.86 0.115 85);
   --brand-glow-near: 22%;
   --brand-glow-far: 7%;
   --border: oklch(1 0 0 / 10%);

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 export default function NotFound() {
   return (
-    <main className="grid min-h-svh place-items-center p-6">
+    <main className="grid flex-1 place-items-center p-6">
       <PageStatus
         icon={FileQuestion}
         title="404 Not Found"

@@ -38,7 +38,7 @@ export default async function Page() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex flex-1 flex-col">
       <AppHeader user={user} />
 
       <main className="relative isolate flex-1 overflow-hidden">

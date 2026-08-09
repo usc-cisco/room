@@ -27,9 +27,16 @@ interface GlobalErrorProps {
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   return (
     <html lang="en" suppressHydrationWarning className="antialiased">
-      <body style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}>
+      {/* This body is its own, so it repeats the root layout's contract: it
+          owns the viewport and the `main` below fills it. No data notice here —
+          a page whose message is "the app did not start" should not also be
+          discussing how fresh the timetable is. */}
+      <body
+        className="flex min-h-svh flex-col"
+        style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}
+      >
         <ThemeProvider>
-          <main className="grid min-h-svh place-items-center bg-background p-6 text-foreground">
+          <main className="grid flex-1 place-items-center bg-background p-6 text-foreground">
             <PageStatus
               icon={Unplug}
               title="The app did not start"
