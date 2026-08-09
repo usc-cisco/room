@@ -17,6 +17,19 @@ export class UnauthorizedError extends Error {
 }
 
 /**
+ * Refused because this account is not on the allowlist.
+ *
+ * Distinct from `UnauthorizedError`: somebody *is* signed in, and telling them
+ * to sign in again would send them round a loop that cannot end well.
+ */
+export class NotAllowedError extends Error {
+  constructor(message = "This account is not on the allowlist.") {
+    super(message)
+    this.name = "NotAllowedError"
+  }
+}
+
+/**
  * Refused for going too fast.
  *
  * Carries the wait so a caller can say *how long* rather than just *no* — a

@@ -6,9 +6,10 @@ import "server-only"
 
 import { asc } from "drizzle-orm"
 
+import { isAllowed } from "@/lib/allowlist/queries"
 import { db } from "@/db"
 import { schedule } from "@/db/schema"
-import { RateLimitedError } from "@/lib/auth/errors"
+import { NotAllowedError, RateLimitedError } from "@/lib/auth/errors"
 import { requireSession } from "@/lib/auth/session"
 import { PAGE_READS, rateLimit } from "@/lib/rate-limit"
 
@@ -73,6 +74,10 @@ function groupByRoom(schedules: readonly RoomSchedule[]): RoomScheduleMap {
  */
 export async function listSchedulesByRoom(): Promise<RoomScheduleMap> {
   const { user } = await requireSession()
+
+  // Before the rate limit, so a refused reader is told the real reason rather
+  // than "too many requests" on their sixtieth reload.
+  if (!isAllowed(user.email)) throw new NotAllowedError()
 
   const decision = rateLimit(`page-reads:${user.id}`, PAGE_READS)
   if (!decision.ok) throw new RateLimitedError(decision.retryAfter)

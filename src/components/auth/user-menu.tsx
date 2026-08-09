@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { uscIdFromEmail } from "@/lib/allowlist/usc-id"
 import { cn } from "@/lib/utils"
 
 import { SignOutDialog } from "./sign-out-dialog"
@@ -28,7 +29,9 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
-  const studentId = email.split("@")[0] // Student ID is the local part of the school address: 00000000@usc.edu.ph.
+  // Falls back to the whole address: only a school account gets an id, and the
+  // menu still has to name whoever is signed in.
+  const studentId = uscIdFromEmail(email) ?? email
 
   function handleSignOutSelect(event: Event) {
     event.preventDefault()

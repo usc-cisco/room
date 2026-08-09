@@ -97,8 +97,8 @@ export const verification = sqliteTable(
  * A recurring class held in a room, one row per weekly meeting.
  *
  * Note: `bun run auth:generate` writes this file. Re-run it with care — the
- * tables below the auth ones are hand-written and are not reproduced by the
- * generator.
+ * tables below the auth ones (`schedule` and `allowlist`) are hand-written and
+ * are not reproduced by the generator.
  */
 export const schedule = sqliteTable(
   "schedule",
@@ -155,6 +155,24 @@ export const schedule = sqliteTable(
     check("schedule_time_order", sql`${table.endTime} > ${table.startTime}`),
   ]
 )
+
+/**
+ * Who may read the timetable, keyed on USC id rather than on `user.id`: a
+ * person is put on the list before they have ever signed in, so there is no row
+ * to point a foreign key at.
+ */
+export const allowlist = sqliteTable("allowlist", {
+  id: text("id").primaryKey(),
+
+  /** Local part of the school address, e.g. `24100907` of `24100907@usc.edu.ph`. */
+  uscId: text("usc_id").notNull().unique(),
+
+  name: text("name").notNull(),
+
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+})
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),

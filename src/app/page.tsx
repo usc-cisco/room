@@ -3,8 +3,9 @@ import { LandingPage } from "@/components/landing/landing-page"
 import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
 import { Container } from "@/components/layout/container"
+import { NotAllowed } from "@/components/layout/not-allowed"
 import { SlowDown } from "@/components/layout/slow-down"
-import { RateLimitedError } from "@/lib/auth/errors"
+import { NotAllowedError, RateLimitedError } from "@/lib/auth/errors"
 import { getSession } from "@/lib/auth/session"
 import { listSchedulesByRoom } from "@/lib/schedules/queries"
 import type { RoomScheduleMap } from "@/lib/schedules/types"
@@ -23,6 +24,10 @@ export default async function Page() {
   try {
     schedulesByRoom = await listSchedulesByRoom()
   } catch (error) {
+    if (error instanceof NotAllowedError) {
+      return <NotAllowed user={user} />
+    }
+
     // Its own screen rather than the error page: this is a speed bump, not a
     // breakage, and the reader can act on it once they know how long to wait.
     if (error instanceof RateLimitedError) {

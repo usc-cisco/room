@@ -19,6 +19,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:ingest-schedules": "tsx scripts/ingest-schedules.ts",
+    "db:ingest-allowlist": "tsx scripts/ingest-allowlist.ts",
     "auth:generate": "better-auth generate --config src/lib/auth/index.ts --output src/db/schema.ts"
   },
   "dependencies": {

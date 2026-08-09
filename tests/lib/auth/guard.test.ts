@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test"
 
 import type { Session } from "@/lib/auth"
-import { UnauthorizedError } from "@/lib/auth/errors"
+import { NotAllowedError, UnauthorizedError } from "@/lib/auth/errors"
 
 /**
- * The session read is replaced rather than exercised: it reaches into
- * `next/headers` and a database, neither of which says anything about the
- * question here — does the gate run the handler, or refuse it?
+ * The session read and the allowlist lookup are replaced rather than
+ * exercised: between them they reach into `next/headers` and a database,
+ * neither of which says anything about the question here — does the gate run
+ * the handler, or refuse it?
  */
 let session: Session | null = null
+let allowed = true
 
 mock.module("@/lib/auth/session", () => ({
   UnauthorizedError,
@@ -18,15 +20,20 @@ mock.module("@/lib/auth/session", () => ({
   },
 }))
 
+mock.module("@/lib/allowlist/queries", () => ({
+  isAllowed: () => allowed,
+}))
+
 const { authedAction } = await import("@/lib/auth/guard")
 
 const SIGNED_IN = {
-  user: { id: "u1", email: "someone@example.edu" },
+  user: { id: "u1", email: "24100907@usc.edu.ph" },
   session: { id: "s1" },
 } as unknown as Session
 
 beforeEach(() => {
   session = null
+  allowed = true
 })
 
 describe("authedAction", () => {
@@ -37,6 +44,30 @@ describe("authedAction", () => {
   })
 
   test("does not run the handler when it refuses", async () => {
+    let ran = false
+    const action = authedAction(async () => {
+      ran = true
+      return "ran"
+    })
+
+    await action(undefined).catch(() => {})
+
+    expect(ran).toBe(false)
+  })
+
+  // Being signed in was never the question: without this, any Google account
+  // could reach an action the allowlist is supposed to be guarding.
+  test("refuses a signed-in account that is not on the allowlist", () => {
+    session = SIGNED_IN
+    allowed = false
+    const action = authedAction(async () => "ran")
+
+    expect(action(undefined)).rejects.toThrow(NotAllowedError)
+  })
+
+  test("does not run the handler for an account off the allowlist", async () => {
+    session = SIGNED_IN
+    allowed = false
     let ran = false
     const action = authedAction(async () => {
       ran = true
