@@ -75,6 +75,28 @@ export function formatTimeRange(start: string, end: string): string {
   return `${formatTime(start)} – ${formatTime(end)}`
 }
 
+/**
+ * A span of minutes as `45 min`, `1 hr` or `1 hr 25 min`.
+ *
+ * Spelled out rather than handed to `Intl.RelativeTimeFormat` for the same
+ * reason `formatLongDate` is: one wording everywhere, instead of output that
+ * shifts with whatever locale the server, the browser or a test is under.
+ *
+ * The unit stays singular at any count — `2 hr 5 min` — because this reads as a
+ * measurement beside a clock rather than as a sentence.
+ */
+export function formatDuration(minutes: number): string {
+  if (minutes < 1) return "under a minute"
+
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+
+  if (hours === 0) return `${rest} min`
+  if (rest === 0) return `${hours} hr`
+
+  return `${hours} hr ${rest} min`
+}
+
 /** `07:30` → minutes since midnight, or null if unparseable. */
 export function toMinutes(value: string): number | null {
   const match = value.match(/^(\d{2}):(\d{2})$/)

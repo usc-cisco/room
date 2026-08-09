@@ -4,6 +4,7 @@ import {
   dayName,
   formatClock,
   formatLongDate,
+  formatDuration,
   formatTime,
   formatTimeRange,
   isCurrent,
@@ -53,6 +54,29 @@ describe("formatTimeRange", () => {
   test("joins both ends", () => {
     expect(formatTimeRange("07:30", "10:00")).toBe("7:30 AM – 10:00 AM")
     expect(formatTimeRange("10:00", "12:30")).toBe("10:00 AM – 12:30 PM")
+  })
+})
+
+describe("formatDuration", () => {
+  test("renders a span under an hour in minutes", () => {
+    expect(formatDuration(1)).toBe("1 min")
+    expect(formatDuration(35)).toBe("35 min")
+    expect(formatDuration(59)).toBe("59 min")
+  })
+
+  test("drops the minutes on a whole hour", () => {
+    expect(formatDuration(60)).toBe("1 hr")
+    expect(formatDuration(120)).toBe("2 hr")
+  })
+
+  test("renders hours and minutes together", () => {
+    expect(formatDuration(85)).toBe("1 hr 25 min")
+    expect(formatDuration(125)).toBe("2 hr 5 min")
+  })
+
+  test("floors anything shorter than a minute", () => {
+    expect(formatDuration(0)).toBe("under a minute")
+    expect(formatDuration(-5)).toBe("under a minute")
   })
 })
 

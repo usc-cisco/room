@@ -10,8 +10,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import type { ClassRoom } from "@/lib/floor-plan/types"
+import { roomAvailability } from "@/lib/schedules/availability"
 import {
   dayName,
+  formatDuration,
+  formatTime,
   formatTimeRange,
   isCurrent,
   minutesOfDay,
@@ -86,6 +89,12 @@ function RoomDay({
         </SheetDescription>
       </SheetHeader>
 
+      {/* Held back when nothing is on today: `EmptyDay` below already says the
+          room is free all day, and says it better. */}
+      {todays.length > 0 ? (
+        <RoomStatus schedules={todays} today={today} minutes={minutes} />
+      ) : null}
+
       {todays.length === 0 ? (
         <EmptyDay today={today} />
       ) : (
@@ -100,6 +109,79 @@ function RoomDay({
         </ol>
       )}
     </>
+  )
+}
+
+/**
+ * The question someone actually walks up with: can I use this room now, and for
+ * how long?
+ *
+ * The list below answers it only after the reader subtracts the clock from a
+ * range themselves, which is work the page can do for them.
+ */
+function RoomStatus({
+  schedules,
+  today,
+  minutes,
+}: {
+  schedules: readonly RoomSchedule[]
+  today: number
+  minutes: number
+}) {
+  const { state, minutesLeft, changesAt } = roomAvailability(
+    schedules,
+    today,
+    minutes
+  )
+  const inUse = state === "in-use"
+
+  const headline =
+    minutesLeft === null
+      ? "Free for the rest of the day"
+      : inUse
+        ? `In use for ${formatDuration(minutesLeft)} more`
+        : `Free for ${formatDuration(minutesLeft)}`
+
+  const detail =
+    changesAt === null
+      ? null
+      : inUse
+        ? `Free at ${formatTime(changesAt)}`
+        : `Next class at ${formatTime(changesAt)}`
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2.5 border-b px-4 py-3",
+        inUse && "bg-destructive/5"
+      )}
+    >
+      {/* Same tokens as an occupied cell and the map's legend, so the sheet and
+          the plate cannot drift apart on what "in use" looks like. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "size-3 shrink-0 ring-1",
+          inUse
+            ? "bg-destructive/10 ring-destructive/40"
+            : "bg-muted ring-border"
+        )}
+      />
+
+      <div className="grid gap-0.5">
+        <p
+          className={cn(
+            "text-sm font-medium",
+            inUse ? "text-destructive" : "text-foreground"
+          )}
+        >
+          {headline}
+        </p>
+        {detail ? (
+          <p className="text-xs text-muted-foreground">{detail}</p>
+        ) : null}
+      </div>
+    </div>
   )
 }
 
