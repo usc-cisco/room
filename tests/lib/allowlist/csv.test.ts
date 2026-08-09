@@ -14,7 +14,7 @@ describe("findMissingColumns", () => {
   })
 
   test("ignores extra columns", () => {
-    expect(findMissingColumns(["usc_id", "name", "program"])).toEqual([])
+    expect(findMissingColumns(["usc_id", "name", "year_level"])).toEqual([])
   })
 
   test("reports a near-miss header as missing rather than guessing", () => {

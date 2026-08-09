@@ -117,8 +117,6 @@ export const schedule = sqliteTable(
     courseDescription: text("course_description").notNull(),
     /** Section/block the class is for, e.g. `G1`. */
     group: text("group").notNull(),
-    /** Degree program the section belongs to, e.g. `BSIT`. */
-    program: text("program").notNull(),
 
     /** 0 = Sunday through 6 = Saturday, matching JS `Date.getDay()`. */
     dayOfWeek: integer("day_of_week").notNull(),

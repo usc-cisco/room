@@ -16,7 +16,6 @@ export interface RoomSchedule {
   courseCode: string
   courseDescription: string
   group: string
-  program: string
   dayOfWeek: number
   startTime: string
   endTime: string

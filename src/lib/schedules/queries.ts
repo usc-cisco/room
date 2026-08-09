@@ -37,7 +37,6 @@ function listSchedules(): RoomSchedule[] {
       courseCode: schedule.courseCode,
       courseDescription: schedule.courseDescription,
       group: schedule.group,
-      program: schedule.program,
       dayOfWeek: schedule.dayOfWeek,
       startTime: schedule.startTime,
       endTime: schedule.endTime,

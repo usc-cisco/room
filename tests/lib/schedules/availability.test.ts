@@ -21,7 +21,6 @@ function meeting(
     courseCode: "CIS 1101",
     courseDescription: "PROGRAMMING I",
     group: "Group 1",
-    program: "CIS",
     dayOfWeek,
     startTime,
     endTime,

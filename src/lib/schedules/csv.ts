@@ -6,7 +6,6 @@ export interface ScheduleInput {
   courseCode: string
   courseDescription: string
   group: string
-  program: string
   dayOfWeek: number
   startTime: string
   endTime: string
@@ -26,7 +25,6 @@ export const CSV_COLUMNS = {
   courseCode: "course_code",
   courseDescription: "course_description",
   group: "group",
-  program: "program",
   dayOfWeek: "day_of_week",
   startTime: "start_time",
   endTime: "end_time",
@@ -117,12 +115,7 @@ export function parseScheduleRow(record: Record<string, string>): ParseResult {
   }
 
   const text: Partial<Record<keyof ScheduleInput, string>> = {}
-  for (const field of [
-    "courseCode",
-    "courseDescription",
-    "group",
-    "program",
-  ] as const) {
+  for (const field of ["courseCode", "courseDescription", "group"] as const) {
     const value = read(field)
     if (!value) errors.push(`${CSV_COLUMNS[field]} is empty`)
     text[field] = value
@@ -161,7 +154,6 @@ export function parseScheduleRow(record: Record<string, string>): ParseResult {
       courseCode: text.courseCode!,
       courseDescription: text.courseDescription!,
       group: text.group!,
-      program: text.program!,
       dayOfWeek: dayOfWeek!,
       startTime: startTime!,
       endTime: endTime!,

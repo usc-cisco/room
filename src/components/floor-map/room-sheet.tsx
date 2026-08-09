@@ -246,8 +246,7 @@ function ClassRow({
       <p className="text-sm font-medium">{entry.courseDescription}</p>
 
       <p className="text-xs text-muted-foreground">
-        <span className="font-mono">{entry.courseCode}</span> · {entry.group} ·{" "}
-        {entry.program}
+        <span className="font-mono">{entry.courseCode}</span> · {entry.group}
       </p>
     </li>
   )
