@@ -1,21 +1,27 @@
-# Next.js template
+# room
 
-This is a Next.js template with shadcn/ui.
+A live map of the DCISM department floor at the University of San Carlos —
+which rooms are in use right now, which are free, and until when.
 
-## Adding components
+Reading the timetable needs a Google sign-in on a `usc.edu.ph` address that is
+on an allowlist.
 
-To add components to your app, run the following command:
+## Quick start
 
 ```bash
-npx shadcn@latest add button
+bun install
+cp .env.example .env      # Google OAuth values and a secret
+bun run db:migrate
+bun run dev
 ```
 
-This will place the ui components in the `components` directory.
+You will not see the map until your USC id is on the allowlist —
+[docs/setup.md](docs/setup.md) has the whole path.
 
-## Using components
+## Docs
 
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button"
-```
+- **[Setup](docs/setup.md)** — running it locally, environment variables,
+  commands.
+- **[Architecture](docs/architecture.md)** — how the pieces fit.
+- **[Operations](docs/operations.md)** — loading schedules and allowlist rows
+  from CSV.
