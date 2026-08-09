@@ -15,19 +15,41 @@ const fontMono = Geist_Mono({
 })
 
 const TITLE = "CISCO – room"
-const DESCRIPTION = "Check what's available, all in one place."
 
-/** No `openGraph.images`: the only mark is white-on-transparent and would
- *  unfurl as an empty tile on most backgrounds. */
+const DESCRIPTION =
+  "See which rooms are free on the DCISM department floor at the University of San Carlos, right now."
+
+const OG_IMAGE = {
+  url: "/og.jpg",
+  width: 1200,
+  height: 630,
+  alt: TITLE,
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(env.appUrl),
   title: TITLE,
   description: DESCRIPTION,
+  applicationName: TITLE,
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
+    url: "/",
     siteName: TITLE,
     title: TITLE,
     description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { "max-image-preview": "large", "max-snippet": -1 },
   },
 }
 

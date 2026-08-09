@@ -150,6 +150,24 @@ Occupancy tinting is held back until after hydration — the server's clock and
 the browser's can legitimately differ, and a mismatch would land on the
 `className` of every cell on the plate.
 
+## SEO and link previews
+
+`src/app/layout.tsx` holds the metadata. `metadataBase` comes from
+`BETTER_AUTH_URL`, which is what turns the relative `/og.jpg` into the absolute
+URL unfurlers require — so that variable being wrong in production means every
+preview and canonical URL points at localhost.
+
+The description deliberately names the subject rather than repeating the hero
+line: a search result and a link preview are read by someone who has not
+arrived, and "check what's available" tells them nothing about rooms, the floor
+or the university.
+
+Two generated routes, both Next file conventions: `src/app/robots.ts` opens the
+site but disallows `/api/`, which answers nothing a crawler can use, and
+`src/app/sitemap.ts` lists the single route. There is one page and it is the
+landing page — everything else is behind the session and the allowlist, so a
+crawler never sees the map.
+
 ## Security
 
 Headers are set in `next.config.ts` for every path, and asserted in
