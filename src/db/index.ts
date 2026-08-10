@@ -14,6 +14,13 @@ function createConnection() {
   mkdirSync(dirname(env.databaseUrl), { recursive: true })
 
   const sqlite = new Database(env.databaseUrl)
+
+  // First, so the pragmas below honour it. `next build` collects page data in
+  // eight parallel workers, each of which imports this module and so opens the
+  // file; setting the journal mode takes an exclusive lock, and without a
+  // timeout the losers fail outright with SQLITE_BUSY rather than waiting. The
+  // ingest scripts open their own connections for the same reason.
+  sqlite.pragma("busy_timeout = 5000")
   sqlite.pragma("journal_mode = WAL")
   sqlite.pragma("foreign_keys = ON")
 

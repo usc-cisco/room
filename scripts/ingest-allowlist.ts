@@ -121,6 +121,9 @@ function main() {
   }
 
   const sqlite = new Database(DATABASE_URL)
+  // The app may be serving from the same file; wait for the lock
+  // rather than failing the whole import with SQLITE_BUSY.
+  sqlite.pragma("busy_timeout = 5000")
   sqlite.pragma("foreign_keys = ON")
   const db = drizzle(sqlite, { schema: { allowlist } })
 
