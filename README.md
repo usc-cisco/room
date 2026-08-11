@@ -25,3 +25,8 @@ You will not see the map until your USC id is on the allowlist —
 - **[Architecture](docs/architecture.md)** — how the pieces fit.
 - **[Operations](docs/operations.md)** — loading schedules and allowlist rows
   from CSV, and what to do when sign-in fails in the evening.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright © 2026 USC Computer and Information
+Sciences Council.
