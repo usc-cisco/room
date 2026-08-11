@@ -10,11 +10,22 @@ import { getSession } from "@/lib/auth/session"
 import { listSchedulesByRoom } from "@/lib/schedules/queries"
 import type { RoomScheduleMap } from "@/lib/schedules/types"
 
-export default async function Page() {
+interface PageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   const session = await getSession()
 
   if (!session) {
-    return <LandingPage />
+    // A failed sign-in comes back here carrying its reason. Only the landing
+    // page has anything to do with it; once signed in, it is stale by
+    // definition.
+    const { error } = await searchParams
+
+    return (
+      <LandingPage authError={typeof error === "string" ? error : undefined} />
+    )
   }
 
   const { user } = session

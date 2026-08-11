@@ -67,6 +67,37 @@ Signing in is not gated. Anyone with a Google account can authenticate and get
 better-auth's own limits are the only thing bounding that: 30 requests per 60
 seconds on the auth endpoints, and a built-in 3-per-10s on `/sign-in*`.
 
+### When sign-in fails
+
+Only one step of the Google round trip needs the network **outbound from this
+server**, and it is not the one the button starts. `/api/auth/sign-in/social`
+builds Google's authorization URL from a hardcoded constant and writes the state
+row — no outgoing request, so it succeeds even when egress is blocked and the
+reader reaches Google normally. The outbound call is the token exchange on the
+way back, in `/api/auth/callback/google`, which POSTs to
+`oauth2.googleapis.com`. Google's own user info needs no call either: it is
+decoded from the id token locally.
+
+So a blocked egress fails **after** consent, not before, and better-auth turns
+the failure into a redirect carrying an `error` code. Left alone it sends that to
+its own error route, which behaves differently by environment — an HTML error
+page in development, a bare `302` to `/?error=…` in production. That divergence
+is why the failure used to be invisible in prod and visible locally.
+
+`GoogleSignInButton` passes `errorCallbackURL`, which takes priority over that
+route and lands the reader on `/?error=<code>` in both environments.
+`src/app/page.tsx` reads the parameter on the signed-out branch and hands it to
+`SignInFailedDialog`, which sorts codes into two: `access_denied` is the reader
+pressing Cancel and says so plainly, everything else gets the connectivity
+explanation. The button then strips the parameter with `replaceState` so a
+refresh cannot replay it.
+
+Two failures never reach that path and are caught in the button itself. A
+request that never leaves the browser **rejects** rather than resolving with an
+error — so it needs a `catch`, not an `if`, or the button sits on "Redirecting to
+Google…" for good. And a dialog opened from the URL has no trigger for Radix to
+restore focus to, so `onCloseAutoFocus` puts it back on the button by hand.
+
 ### Rate limits
 
 In `src/lib/rate-limit.ts`, fixed-window and per user:

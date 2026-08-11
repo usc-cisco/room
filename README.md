@@ -24,4 +24,4 @@ You will not see the map until your USC id is on the allowlist —
   commands.
 - **[Architecture](docs/architecture.md)** — how the pieces fit.
 - **[Operations](docs/operations.md)** — loading schedules and allowlist rows
-  from CSV.
+  from CSV, and what to do when sign-in fails in the evening.

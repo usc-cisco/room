@@ -1,7 +1,7 @@
 # Operations
 
-Running the thing: who may read it, what they read, and the switch for when the
-data is behind.
+Running the thing: who may read it, what they read, the switch for when the data
+is behind, and the one failure that is the network's rather than the app's.
 
 Both ingest scripts work the same way. The whole file is validated before
 anything is written and the insert runs in one transaction, so a CSV with a
@@ -102,6 +102,55 @@ on. It needs a restart, not just a reload, since it is read server-side.
 
 Turn it on while the data is known to be behind, and off once an ingest has
 caught up.
+
+## When sign-in stops working in the evening
+
+The DCISM host refuses outgoing requests overnight. Google sign-in needs one, so
+it fails for as long as that lasts, and there is nothing to fix in the app when
+it does — it is the network, and it comes back on its own.
+
+What the reader sees: they press the button, reach Google, consent, and arrive
+back on the landing page with a dialog saying the site could not reach Google and
+that this usually happens in the evenings. Before that dialog existed they
+arrived back with nothing at all, which read as a dead button.
+
+The wording deliberately names no hours. The window is the host's to change, and
+copy that states a time is wrong the day it moves.
+
+**The tell, if you are diagnosing a report.** Ask whether the button's label
+changes to "Redirecting to Google…" when pressed.
+
+| What happens                                            | Where the fault is                                                                                                                                       |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Label changes, reaches Google, comes back to the dialog | The overnight block. Expected; wait it out.                                                                                                              |
+| Label changes but Google is never reached               | Not the block — that first request never leaves the host. Look at the reader's own connection, the 3-per-10s limit on `/sign-in*`, or Apache.            |
+| Label never changes                                     | Upstream of this code: the JS never loaded or the handler never attached. Nothing in the sign-in path can report this, because nothing of it is running. |
+
+**Reproducing it deliberately.** Make the token endpoint unreachable from the
+server and nothing else — the browser never contacts that host, only
+`accounts.google.com`, so this blocks exactly what the firewall blocks:
+
+```bash
+echo "192.0.2.1 oauth2.googleapis.com" | sudo tee -a /etc/hosts
+```
+
+`192.0.2.1` is non-routable, so packets are dropped and the connection hangs as
+it would behind a firewall; `127.0.0.1` fails instantly instead. Test against
+`bun run build && bun run start`, **not** `bun run dev` — better-auth's default
+error route branches on `NODE_ENV`, so dev would not show you what production
+does. Remove the line afterwards:
+
+```bash
+sudo sed -i '' '/oauth2.googleapis.com/d' /etc/hosts
+```
+
+Browser-level tricks do not work here. DevTools "Offline" and Playwright request
+interception only reach requests the _browser_ makes; the failing call is
+server-side, inside Node.
+
+For checking the dialog's wording alone, `/?error=invalid_code` and
+`/?error=access_denied` render it directly — but they skip the redirect chain,
+so they prove the copy and nothing about the wiring.
 
 ## Deploying
 

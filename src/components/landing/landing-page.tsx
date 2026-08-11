@@ -5,7 +5,12 @@ import { Container } from "@/components/layout/container"
 
 import { WhySignIn } from "./why-sign-in"
 
-export function LandingPage() {
+interface LandingPageProps {
+  /** The `error` code a failed trip to Google left behind, if there was one. */
+  authError?: string
+}
+
+export function LandingPage({ authError }: LandingPageProps) {
   return (
     <div className="flex flex-1 flex-col">
       <AppHeader />
@@ -17,7 +22,7 @@ export function LandingPage() {
         />
 
         <Container className="row-start-2 py-8">
-          <Hero />
+          <Hero authError={authError} />
         </Container>
       </main>
 
@@ -26,7 +31,7 @@ export function LandingPage() {
   )
 }
 
-function Hero() {
+function Hero({ authError }: LandingPageProps) {
   return (
     <section
       aria-labelledby="hero-heading"
@@ -48,7 +53,7 @@ function Hero() {
 
       <div className="grid justify-items-center gap-3">
         <div className="w-full max-w-xs">
-          <GoogleSignInButton />
+          <GoogleSignInButton authError={authError} />
         </div>
 
         <WhySignIn />
