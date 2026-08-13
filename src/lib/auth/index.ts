@@ -9,6 +9,7 @@ import { nextCookies } from "better-auth/next-js"
 import { db } from "@/db"
 import * as schema from "@/db/schema"
 
+import { USC_DOMAIN } from "../allowlist/usc-id"
 import { env } from "../env"
 
 export const auth = betterAuth({
@@ -26,6 +27,9 @@ export const auth = betterAuth({
     google: {
       clientId: env.googleClientId,
       clientSecret: env.googleClientSecret,
+      // Narrows Google's account chooser to the school domain. A hint only —
+      // `isAllowed` is still what decides who gets in.
+      hd: USC_DOMAIN,
     },
   },
   // These endpoints are the only ones a stranger can reach, so they carry their

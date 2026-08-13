@@ -2,6 +2,7 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in-button"
 import { AppFooter } from "@/components/layout/app-footer"
 import { AppHeader } from "@/components/layout/app-header"
 import { Container } from "@/components/layout/container"
+import { USC_DOMAIN } from "@/lib/allowlist/usc-id"
 
 import { WhySignIn } from "./why-sign-in"
 
@@ -23,6 +24,13 @@ export function LandingPage({ authError }: LandingPageProps) {
 
         <Container className="row-start-2 py-8">
           <Hero authError={authError} />
+        </Container>
+
+        {/* Out of the hero's stack, so the reason for the gate reads as a
+            separate offer rather than another line of the sign-in group. The
+            row's own padding is the whole gap. */}
+        <Container className="row-start-3 grid justify-items-center self-start py-8">
+          <WhySignIn />
         </Container>
       </main>
 
@@ -51,12 +59,14 @@ function Hero({ authError }: LandingPageProps) {
         </p>
       </div>
 
-      <div className="grid justify-items-center gap-3">
-        <div className="w-full max-w-xs">
-          <GoogleSignInButton authError={authError} />
-        </div>
+      {/* The hint belongs to the button, so it stays tucked under it. */}
+      <div className="grid w-full max-w-xs justify-items-center gap-2">
+        <GoogleSignInButton authError={authError} />
 
-        <WhySignIn />
+        <p className="text-xs text-muted-foreground">
+          For <span className="font-medium text-foreground">@{USC_DOMAIN}</span>{" "}
+          accounts only
+        </p>
       </div>
     </section>
   )
