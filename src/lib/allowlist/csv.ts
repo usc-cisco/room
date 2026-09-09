@@ -3,7 +3,8 @@ import { USC_DOMAIN } from "./usc-id"
 /** A validated row, shaped for insertion into the `allowlist` table. */
 export interface AllowlistInput {
   uscId: string
-  name: string
+  /** Null when the CSV has no `name` column, or leaves the cell empty. */
+  name: string | null
 }
 
 export type ParseResult =
@@ -19,8 +20,14 @@ export const CSV_COLUMNS = {
   name: "name",
 } as const satisfies Record<keyof AllowlistInput, string>
 
-/** Every column an allowlist CSV must carry, in the order they should appear. */
-export const REQUIRED_COLUMNS: readonly string[] = Object.values(CSV_COLUMNS)
+/**
+ * Every column an allowlist CSV must carry.
+ *
+ * The id alone decides who may sign in, so a roster export listing nothing
+ * else is a complete allowlist; `name` is optional and stored as null when it
+ * is absent.
+ */
+export const REQUIRED_COLUMNS: readonly string[] = [CSV_COLUMNS.uscId]
 
 /**
  * Required columns absent from a header row, in declaration order. Extra
@@ -53,13 +60,12 @@ export function parseAllowlistRow(record: Record<string, string>): ParseResult {
   }
 
   const name = read("name")
-  if (!name) errors.push("name is empty")
 
   if (errors.length) {
     return { ok: false, errors }
   }
 
-  return { ok: true, value: { uscId, name } }
+  return { ok: true, value: { uscId, name: name || null } }
 }
 
 /**

@@ -165,7 +165,8 @@ export const allowlist = sqliteTable("allowlist", {
   /** Local part of the school address, e.g. `24100907` of `24100907@usc.edu.ph`. */
   uscId: text("usc_id").notNull().unique(),
 
-  name: text("name").notNull(),
+  /** Null when the roster we were given carries only ids. */
+  name: text("name"),
 
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

@@ -29,6 +29,13 @@
       "when": 1786291737376,
       "tag": "0003_high_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788918545981,
+      "tag": "0004_mixed_miss_america",
+      "breakpoints": true
     }
   ]
 }

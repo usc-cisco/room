@@ -13,8 +13,12 @@ describe("findMissingColumns", () => {
     expect(findMissingColumns(["usc_id", "name"])).toEqual([])
   })
 
+  test("accepts a roster carrying only the id", () => {
+    expect(findMissingColumns(["usc_id"])).toEqual([])
+  })
+
   test("ignores extra columns", () => {
-    expect(findMissingColumns(["usc_id", "name", "year_level"])).toEqual([])
+    expect(findMissingColumns(["usc_id", "email"])).toEqual([])
   })
 
   test("reports a near-miss header as missing rather than guessing", () => {
@@ -59,14 +63,22 @@ describe("parseAllowlistRow", () => {
     expect(result.ok === false && result.errors[0]).toContain("whitespace")
   })
 
-  test("collects every problem in a row rather than the first", () => {
-    const result = parseAllowlistRow(row("", ""))
+  test("stores a null name when the row has none", () => {
+    const result = parseAllowlistRow({ usc_id: "24100907" })
 
-    expect(result.ok).toBe(false)
-    expect(result.ok === false && result.errors).toEqual([
-      "usc_id is empty",
-      "name is empty",
-    ])
+    expect(result).toEqual({
+      ok: true,
+      value: { uscId: "24100907", name: null },
+    })
+  })
+
+  test("stores a null name when the cell is empty", () => {
+    const result = parseAllowlistRow(row("24100907", "   "))
+
+    expect(result).toEqual({
+      ok: true,
+      value: { uscId: "24100907", name: null },
+    })
   })
 
   test("treats a missing column as empty", () => {
