@@ -7,6 +7,7 @@ import { NotAllowed } from "@/components/layout/not-allowed"
 import { SlowDown } from "@/components/layout/slow-down"
 import { NotAllowedError, RateLimitedError } from "@/lib/auth/errors"
 import { getSession } from "@/lib/auth/session"
+import { env } from "@/lib/env"
 import { listSchedulesByRoom } from "@/lib/schedules/queries"
 import type { RoomScheduleMap } from "@/lib/schedules/types"
 
@@ -59,7 +60,10 @@ export default async function Page({ searchParams }: PageProps) {
         />
 
         <Container className="py-8 sm:py-12">
-          <FloorMap schedulesByRoom={schedulesByRoom} />
+          <FloorMap
+            schedulesByRoom={schedulesByRoom}
+            supportEmail={env.supportEmail}
+          />
         </Container>
       </main>
 

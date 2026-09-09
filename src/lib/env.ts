@@ -17,8 +17,9 @@ function required(name: string): string {
 export const env = {
   databaseUrl: process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
   appUrl: process.env.BETTER_AUTH_URL ?? DEFAULT_APP_URL,
-  /** Who someone refused by the allowlist should write to. Optional: with no
-   *  address set, the refusal page simply does not offer one. */
+  /** Who to write to about being added to the allowlist, or about room data
+   *  that disagrees with the floor. Optional: with no address set, the refusal
+   *  page and the map disclaimer simply do not offer one. */
   supportEmail: process.env.SUPPORT_EMAIL?.trim() || null,
   /** Exact `"true"`, not a truthiness test: the classic env-flag bug is
    *  `SHOW_DATA_NOTICE=false` switching the thing on. */

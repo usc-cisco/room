@@ -14,6 +14,7 @@ import type { RoomScheduleMap } from "@/lib/schedules/types"
 
 import { CurrentTime } from "./current-time"
 import { FreeRoomsSheet } from "./free-rooms-sheet"
+import { MapDisclaimer } from "./map-disclaimer"
 import { MapGrid } from "./map-grid"
 import { RoomSearch } from "./room-search"
 import { RoomSheet } from "./room-sheet"
@@ -21,6 +22,8 @@ import { RoomSheet } from "./room-sheet"
 interface FloorMapProps {
   /** Every meeting on the floor, all days, keyed by room id. */
   schedulesByRoom: RoomScheduleMap
+  /** Where to report a discrepancy. Read from the environment on the server. */
+  supportEmail: string | null
 }
 
 const NO_ROOMS: ReadonlySet<string> = new Set()
@@ -33,7 +36,7 @@ const NO_ROOMS: ReadonlySet<string> = new Set()
  * map is presentational. One clock rather than one per component, so the
  * heading, the occupancy tint and the sheet cannot disagree at a changeover.
  */
-export function FloorMap({ schedulesByRoom }: FloorMapProps) {
+export function FloorMap({ schedulesByRoom, supportEmail }: FloorMapProps) {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [freeOpen, setFreeOpen] = useState(false)
@@ -114,6 +117,8 @@ export function FloorMap({ schedulesByRoom }: FloorMapProps) {
           onSelect={handleSelect}
         />
       </div>
+
+      <MapDisclaimer supportEmail={supportEmail} />
 
       <RoomSheet
         room={selectedRoom}
