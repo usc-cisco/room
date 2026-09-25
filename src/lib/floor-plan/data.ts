@@ -22,7 +22,7 @@ import type {
  * `ROW_TRACKS` needs no such conversion: the tracks are `fr` values in those
  * same plan units, so the two axes stay on one scale.
  */
-export const GRID_COLUMNS = 32
+export const GRID_COLUMNS = 35
 
 /**
  * Row tracks, north to south. Rooms hold their measured depth on the plan; the
@@ -45,26 +45,59 @@ export const ROW_TRACKS = [
   "37.5fr", // 2  its corridor
   "24fr", //   3  open floor, compressed
   "37.5fr", // 4  west wing corridor
-  "118fr", //  5  west wing rooms
-  "24fr", //   6  central open floor, compressed
-  "112fr", //  7  middle wing rooms
-  "37.5fr", // 8  its corridor
-  "24fr", //   9  open floor, compressed
-  "37.5fr", // 10 east wing corridor
-  "114fr", //  11 east wing rooms
+  "59.5fr", // 5  west wing rooms; LB400 ends here
+  "58.5fr", // 6  west wing rooms
+  "24fr", //   7  central open floor, compressed
+  "15fr", //   8  middle wing rooms; LB401 ends here
+  "97fr", //   9  middle wing rooms; LB402
+  "37.5fr", // 10 its corridor
+  "24fr", //   11 open floor, compressed
+  "37.5fr", // 12 east wing corridor
+  "114fr", //  13 east wing rooms
 ] as const
 
 /**
- * The plate's proportions in plan units: 32 columns of 37.5 across, against the
+ * The plate's proportions in plan units: 35 columns of 37.5 across, against the
  * summed row tracks down. Pinning it is what holds one unit to one size on both
  * axes, and so what keeps rooms to scale at every width rather than at one.
  */
 export const PLATE_ASPECT = { width: GRID_COLUMNS * 37.5, height: 683 }
 
 /** Where the wings' rooms start, east of the corridor spine that serves them. */
-const RUN = 2
+const RUN = 5
 
 export const FLOOR_CELLS: readonly FloorCell[] = [
+  // ── LB400–LB402 ────────────────────────────────────────────────────────
+  // Three equal rooms along the south spine, from the west corridor to the end
+  // of the middle wing.
+  {
+    id: "lb400",
+    code: "LB400",
+    kind: "room",
+    col: 1,
+    span: 3,
+    row: 4,
+    rowSpan: 2,
+  },
+  {
+    id: "lb401",
+    code: "LB401",
+    kind: "room",
+    col: 1,
+    span: 3,
+    row: 6,
+    rowSpan: 3,
+  },
+  {
+    id: "lb402",
+    code: "LB402",
+    kind: "room",
+    col: 1,
+    span: 3,
+    row: 9,
+    rowSpan: 1,
+  },
+
   // ── LB442–LB443 block ──────────────────────────────────────────────────
   // Detached from the rest of the floor, across the open ground. The plan draws
   // the two flush, so they share one row rather than staggering.
@@ -92,8 +125,16 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     col: RUN,
     span: 2,
     row: 5,
+    rowSpan: 2,
   },
-  { id: "row-a-excluded", kind: "excluded", col: RUN + 2, span: 6, row: 5 },
+  {
+    id: "row-a-excluded",
+    kind: "excluded",
+    col: RUN + 2,
+    span: 6,
+    row: 5,
+    rowSpan: 2,
+  },
   {
     id: "control",
     name: "Control Room",
@@ -101,11 +142,44 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     col: RUN + 8,
     span: 4,
     row: 5,
+    rowSpan: 2,
   },
-  { id: "lb445", code: "LB445", kind: "room", col: RUN + 12, span: 4, row: 5 },
-  { id: "lb446", code: "LB446", kind: "room", col: RUN + 16, span: 4, row: 5 },
-  { id: "lb447", code: "LB447", kind: "room", col: RUN + 20, span: 4, row: 5 },
-  { id: "lb448", code: "LB448", kind: "room", col: RUN + 24, span: 4, row: 5 },
+  {
+    id: "lb445",
+    code: "LB445",
+    kind: "room",
+    col: RUN + 12,
+    span: 4,
+    row: 5,
+    rowSpan: 2,
+  },
+  {
+    id: "lb446",
+    code: "LB446",
+    kind: "room",
+    col: RUN + 16,
+    span: 4,
+    row: 5,
+    rowSpan: 2,
+  },
+  {
+    id: "lb447",
+    code: "LB447",
+    kind: "room",
+    col: RUN + 20,
+    span: 4,
+    row: 5,
+    rowSpan: 2,
+  },
+  {
+    id: "lb448",
+    code: "LB448",
+    kind: "room",
+    col: RUN + 24,
+    span: 4,
+    row: 5,
+    rowSpan: 2,
+  },
   {
     id: "cr-a-east",
     name: "Comfort Room",
@@ -113,6 +187,7 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     col: RUN + 28,
     span: 2,
     row: 5,
+    rowSpan: 2,
   },
 
   // ── Middle wing ────────────────────────────────────────────────────────
@@ -122,7 +197,8 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     kind: "comfort",
     col: RUN,
     span: 2,
-    row: 7,
+    row: 8,
+    rowSpan: 2,
   },
   {
     id: "department",
@@ -130,31 +206,64 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
     kind: "facility",
     col: RUN + 2,
     span: 12,
-    row: 7,
+    row: 8,
+    rowSpan: 2,
   },
-  { id: "lb467", code: "LB467", kind: "room", col: RUN + 14, span: 4, row: 7 },
-  { id: "lb468", code: "LB468", kind: "room", col: RUN + 18, span: 4, row: 7 },
-  { id: "lb469", code: "LB469", kind: "room", col: RUN + 22, span: 4, row: 7 },
-  { id: "lb470", code: "LB470", kind: "room", col: RUN + 26, span: 4, row: 7 },
+  {
+    id: "lb467",
+    code: "LB467",
+    kind: "room",
+    col: RUN + 14,
+    span: 4,
+    row: 8,
+    rowSpan: 2,
+  },
+  {
+    id: "lb468",
+    code: "LB468",
+    kind: "room",
+    col: RUN + 18,
+    span: 4,
+    row: 8,
+    rowSpan: 2,
+  },
+  {
+    id: "lb469",
+    code: "LB469",
+    kind: "room",
+    col: RUN + 22,
+    span: 4,
+    row: 8,
+    rowSpan: 2,
+  },
+  {
+    id: "lb470",
+    code: "LB470",
+    kind: "room",
+    col: RUN + 26,
+    span: 4,
+    row: 8,
+    rowSpan: 2,
+  },
   // This wing carries its corridor on the inner face, the opposite side from
   // the west wing, which is why the two corridor tracks sit either side of the
   // rooms rather than both above them.
-  { id: "corridor-middle", kind: "corridor", col: RUN, span: 30, row: 8 },
+  { id: "corridor-middle", kind: "corridor", col: RUN, span: 30, row: 10 },
 
   // ── East wing ──────────────────────────────────────────────────────────
-  { id: "corridor-east", kind: "corridor", col: RUN, span: 30, row: 10 },
-  { id: "south-excluded", kind: "excluded", col: RUN, span: 12, row: 11 },
-  { id: "lb483", code: "LB483", kind: "room", col: RUN + 12, span: 4, row: 11 },
-  { id: "lb484", code: "LB484", kind: "room", col: RUN + 16, span: 4, row: 11 },
-  { id: "lb485", code: "LB485", kind: "room", col: RUN + 20, span: 4, row: 11 },
-  { id: "lb486", code: "LB486", kind: "room", col: RUN + 24, span: 4, row: 11 },
+  { id: "corridor-east", kind: "corridor", col: RUN, span: 30, row: 12 },
+  { id: "south-excluded", kind: "excluded", col: RUN, span: 12, row: 13 },
+  { id: "lb483", code: "LB483", kind: "room", col: RUN + 12, span: 4, row: 13 },
+  { id: "lb484", code: "LB484", kind: "room", col: RUN + 16, span: 4, row: 13 },
+  { id: "lb485", code: "LB485", kind: "room", col: RUN + 20, span: 4, row: 13 },
+  { id: "lb486", code: "LB486", kind: "room", col: RUN + 24, span: 4, row: 13 },
   {
     id: "cr-b-east",
     name: "Comfort Room",
     kind: "comfort",
     col: RUN + 28,
     span: 2,
-    row: 11,
+    row: 13,
   },
 
   // ── Circulation across the wings ───────────────────────────────────────
@@ -164,18 +273,18 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   {
     id: "corridor-spine-south",
     kind: "corridor",
-    col: 1,
+    col: 4,
     span: 1,
     row: 1,
-    rowSpan: 11,
+    rowSpan: 13,
   },
   {
     id: "corridor-spine-north",
     kind: "corridor",
-    col: 32,
+    col: 35,
     span: 1,
     row: 4,
-    rowSpan: 8,
+    rowSpan: 10,
   },
 ]
 

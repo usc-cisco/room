@@ -54,7 +54,7 @@ export default function Loading() {
                 <div className="grid gap-1.5">
                   <Skeleton className="h-4 w-24" />
                   <Skeleton
-                    className="plate w-full border border-foreground/25 max-md:mx-auto max-md:max-w-[26rem] md:min-w-[38rem]"
+                    className="plate w-full border border-foreground/25 max-md:mx-auto max-md:max-w-[26rem] md:min-w-[41rem]"
                     style={PLATE_STYLE}
                   />
                 </div>

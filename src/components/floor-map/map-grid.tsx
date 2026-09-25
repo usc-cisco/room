@@ -27,7 +27,7 @@ interface MapGridProps {
   onSelect: (id: string) => void
 }
 
-/** Equal tracks along the plate's 32-column axis, whichever way it is turned. */
+/** Equal tracks along the plate's column axis, whichever way it is turned. */
 const EQUAL_TRACKS = `repeat(${GRID_COLUMNS}, minmax(0, 1fr))`
 
 /**
@@ -79,7 +79,7 @@ function blockStyle(area: GridArea): React.CSSProperties {
  * the narrow blocks read smaller than they are.
  *
  * Below `md` the plate is turned back to the plan's own north-up orientation.
- * Landscape needs 38rem to stay legible and a phone cannot give it that, and
+ * Landscape needs 41rem to stay legible and a phone cannot give it that, and
  * hiding half the floor behind a sideways scroll is worse than turning the map
  * to the shape the screen actually is.
  */
@@ -109,7 +109,7 @@ export function MapGrid({
           //
           // The outer wall is a border, not a ring: a ring spreads outside the
           // border box and the scroll container clips it away at both edges.
-          className="plate grid gap-0.5 border border-foreground/25 bg-background p-2.5 max-md:mx-auto max-md:max-w-[26rem] sm:p-3 md:min-w-[38rem]"
+          className="plate grid gap-0.5 border border-foreground/25 bg-background p-2.5 max-md:mx-auto max-md:max-w-[26rem] sm:p-3 md:min-w-[41rem]"
           style={PLATE_STYLE}
         >
           {FLOOR_CELLS.map((cell) => (
@@ -127,6 +127,11 @@ export function MapGrid({
           ))}
         </div>
       </div>
+
+      {/* Held to the plate's measure below `md`, like the key above it. */}
+      <p className="text-xs leading-tight text-muted-foreground max-md:mx-auto max-md:w-full max-md:max-w-[26rem]">
+        * Map not to scale.
+      </p>
     </div>
   )
 }

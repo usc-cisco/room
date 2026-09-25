@@ -114,4 +114,22 @@ describe("floor plan data", () => {
       expect(ROOM_STATUS_LABEL[cell.status], cell.id).toBeTruthy()
     }
   })
+
+  test("LB400–LB402 are class rooms of equal depth", () => {
+    const depth = (id: string) => {
+      const cell = FLOOR_CELLS.find((candidate) => candidate.id === id)
+
+      if (cell?.kind !== "room") throw new Error(`No class room ${id}`)
+
+      return ROW_TRACKS.slice(cell.row - 1, cell.row - 1 + (cell.rowSpan ?? 1))
+        .map((track) => Number.parseFloat(track))
+        .reduce((total, track) => total + track, 0)
+    }
+
+    const depths = ["lb400", "lb401", "lb402"].map(depth)
+
+    for (const value of depths) {
+      expect(Math.abs(value - depths[0]) / depths[0]).toBeLessThan(0.01)
+    }
+  })
 })

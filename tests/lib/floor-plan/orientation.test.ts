@@ -49,7 +49,7 @@ describe("portraitPlacement", () => {
   // north-up must move it to the wing's column and near the top.
   test("turns a west wing room onto the wing's column", () => {
     expect(portraitPlacement(cell("lb448"))).toEqual({
-      column: "5 / span 1",
+      column: "5 / span 2",
       row: "4 / span 4",
     })
   })
@@ -59,7 +59,7 @@ describe("portraitPlacement", () => {
   test("lays the north spine along the top", () => {
     const placed = portraitPlacement(cell("corridor-spine-north"))
 
-    expect(placed).toEqual({ column: "4 / span 8", row: "1 / span 1" })
+    expect(placed).toEqual({ column: "4 / span 10", row: "1 / span 1" })
   })
 
   // The plan's southern corridor: the opposite edge from the north spine, and
@@ -67,9 +67,20 @@ describe("portraitPlacement", () => {
   // bottom rather than beside anything.
   test("lays the south spine along the bottom", () => {
     expect(portraitPlacement(cell("corridor-spine-south"))).toEqual({
-      column: "1 / span 11",
+      column: "1 / span 13",
       row: "32 / span 1",
     })
+  })
+
+  test("lays LB400–LB402 along the bottom, west to east", () => {
+    const placed = ["lb400", "lb401", "lb402"].map((id) =>
+      portraitPlacement(cell(id))
+    )
+
+    for (const { row } of placed) {
+      expect(row).toBe(`${GRID_COLUMNS - 2} / span 3`)
+    }
+    expect(placed.map(({ column }) => start(column))).toEqual([4, 6, 9])
   })
 
   // LB445 is south of LB448 on the plan, so portrait must draw it lower.
