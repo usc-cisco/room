@@ -93,14 +93,16 @@ export function GoogleSignInButton({
     <>
       <Button
         ref={buttonRef}
-        variant="outline"
         size="lg"
         className="w-full"
         onClick={handleSignIn}
         disabled={isPending}
         aria-busy={isPending}
       >
-        <GoogleIcon />
+        {/* Google's mark sits on white so its colours hold on the brand fill. */}
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white">
+          <GoogleIcon className="size-3.5" />
+        </span>
         {isPending ? "Redirecting to Google…" : "Continue with Google"}
       </Button>
 
