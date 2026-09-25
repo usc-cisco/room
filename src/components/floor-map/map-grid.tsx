@@ -3,6 +3,7 @@
 import {
   FLOOR_CELLS,
   GRID_COLUMNS,
+  isClosed,
   PLATE_ASPECT,
   ROW_TRACKS,
 } from "@/lib/floor-plan/data"
@@ -14,6 +15,7 @@ import {
 } from "@/lib/floor-plan/orientation"
 import { matchesQuery } from "@/lib/floor-plan/search"
 import type { FloorSpace } from "@/lib/floor-plan/types"
+import { cn } from "@/lib/utils"
 
 import { MapCell, type CellState } from "./map-cell"
 
@@ -114,7 +116,8 @@ export function MapGrid({
             <MapCell
               key={cell.id}
               space={cell}
-              occupied={occupiedIds.has(cell.id)}
+              occupied={!isClosed(cell) && occupiedIds.has(cell.id)}
+              closed={isClosed(cell)}
               selected={cell.id === selectedId}
               state={stateFor(cell)}
               onSelect={onSelect}
@@ -129,7 +132,7 @@ export function MapGrid({
 }
 
 /**
- * Says what the red tint means.
+ * Says what the cell tints mean.
  *
  * Sits above the plate rather than in it: it is a note about the drawing, not
  * part of the floor, and outside the plate it neither has to find a corner that
@@ -139,15 +142,27 @@ function OccupancyKey() {
   return (
     // Held to the plate's own measure below `md`, where the plate centres
     // itself, so the key starts on the same edge as the drawing it explains.
-    <div className="flex items-center gap-1.5 max-md:mx-auto max-md:w-full max-md:max-w-[26rem]">
-      {/* Same tokens as an occupied cell, so the key and the thing it explains
-          cannot drift apart. */}
-      <span
-        aria-hidden="true"
-        className="size-3 shrink-0 bg-destructive/10 ring-1 ring-destructive/40"
+    <div className="flex items-center gap-4 max-md:mx-auto max-md:w-full max-md:max-w-[26rem]">
+      <KeyItem
+        swatch="bg-destructive/10 ring-1 ring-destructive/40"
+        label="In use now"
       />
+      <KeyItem
+        swatch="bg-muted outline-1 -outline-offset-1 outline-muted-foreground/50 outline-dashed"
+        label="Closed"
+      />
+    </div>
+  )
+}
+
+/** One swatch and its meaning in the key. */
+function KeyItem({ swatch, label }: { swatch: string; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {/* Swatches use the same tokens as the cells they explain. */}
+      <span aria-hidden="true" className={cn("size-3 shrink-0", swatch)} />
       <span className="text-xs leading-tight text-muted-foreground">
-        In use now
+        {label}
       </span>
     </div>
   )

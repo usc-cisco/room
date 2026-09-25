@@ -4,8 +4,10 @@ import {
   CLASS_ROOMS,
   FLOOR_CELLS,
   GRID_COLUMNS,
+  isClosed,
   NAMED_SPACES,
   PLATE_ASPECT,
+  ROOM_STATUS_LABEL,
   ROW_TRACKS,
 } from "@/lib/floor-plan/data"
 
@@ -89,5 +91,27 @@ describe("floor plan data", () => {
 
     expect(PLATE_ASPECT.height).toBe(depth)
     expect(PLATE_ASPECT.width / GRID_COLUMNS).toBe(37.5)
+  })
+
+  test("LB443 is closed for renovation", () => {
+    const lb443 = CLASS_ROOMS.find((room) => room.id === "lb443")
+
+    expect(lb443?.status).toBe("renovation")
+    expect(lb443 && isClosed(lb443)).toBe(true)
+  })
+
+  test("a room without a status is open", () => {
+    const lb442 = CLASS_ROOMS.find((room) => room.id === "lb442")
+
+    expect(lb442 && isClosed(lb442)).toBe(false)
+  })
+
+  test("only teaching rooms carry a status, and every status has a label", () => {
+    for (const cell of FLOOR_CELLS) {
+      if (cell.status === undefined) continue
+
+      expect(cell.kind, cell.id).toBe("room")
+      expect(ROOM_STATUS_LABEL[cell.status], cell.id).toBeTruthy()
+    }
   })
 })

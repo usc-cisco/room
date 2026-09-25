@@ -1,4 +1,10 @@
-import type { ClassRoom, FloorCell, NamedSpace } from "./types"
+import type {
+  ClassRoom,
+  FloorCell,
+  FloorSpace,
+  NamedSpace,
+  RoomStatus,
+} from "./types"
 
 /**
  * The plate is traced off the posted evacuation plan, and every room size here
@@ -63,7 +69,15 @@ export const FLOOR_CELLS: readonly FloorCell[] = [
   // Detached from the rest of the floor, across the open ground. The plan draws
   // the two flush, so they share one row rather than staggering.
   { id: "lb442", code: "LB442", kind: "room", col: RUN, span: 4, row: 1 },
-  { id: "lb443", code: "LB443", kind: "room", col: RUN + 4, span: 4, row: 1 },
+  {
+    id: "lb443",
+    code: "LB443",
+    kind: "room",
+    status: "renovation",
+    col: RUN + 4,
+    span: 4,
+    row: 1,
+  },
   // Serves the block and stops with it, at LB443's far wall.
   { id: "corridor-lb442s", kind: "corridor", col: RUN, span: 8, row: 2 },
 
@@ -175,3 +189,13 @@ export const NAMED_SPACES: readonly NamedSpace[] = FLOOR_CELLS.filter(
 export const CLASS_ROOMS: readonly ClassRoom[] = FLOOR_CELLS.filter(
   (cell): cell is FloorCell & ClassRoom => cell.kind === "room"
 )
+
+/** How each out-of-service status reads to a person. */
+export const ROOM_STATUS_LABEL: Record<RoomStatus, string> = {
+  renovation: "Under renovation",
+}
+
+/** Whether a space is out of service and must never read as free. */
+export function isClosed(space: FloorSpace): boolean {
+  return space.status !== undefined
+}

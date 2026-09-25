@@ -10,6 +10,9 @@
  */
 export type CellKind = "room" | "comfort" | "facility" | "corridor" | "excluded"
 
+/** Why a room is out of service. */
+export type RoomStatus = "renovation"
+
 /** What a block on the plate is, independent of where it sits. */
 export interface FloorSpace {
   /** Stable key, also used as the selection id. */
@@ -20,6 +23,8 @@ export interface FloorSpace {
   name?: string
   description?: string
   kind: CellKind
+  /** Set while the room is out of service; absent means in use as normal. */
+  status?: RoomStatus
 }
 
 /** A block placed on the grid. */

@@ -39,6 +39,12 @@ const cellVariants = cva(
         true: "bg-destructive/10 text-destructive ring-1 ring-destructive/40",
         false: "",
       },
+      // Out of service: muted with a dashed edge, apart from both "in use" and
+      // the excluded hatch.
+      closed: {
+        true: "bg-muted text-muted-foreground ring-0 outline-1 -outline-offset-1 outline-muted-foreground/50 outline-dashed",
+        false: "",
+      },
       selected: {
         true: "z-10 bg-primary text-primary-foreground ring-2 ring-primary",
         false: "",
@@ -49,7 +55,12 @@ const cellVariants = cva(
         dimmed: "opacity-35",
       },
     },
-    defaultVariants: { occupied: false, selected: false, state: "idle" },
+    defaultVariants: {
+      occupied: false,
+      closed: false,
+      selected: false,
+      state: "idle",
+    },
   }
 )
 
@@ -59,6 +70,8 @@ interface MapCellProps {
   space: FloorSpace
   /** A class is in session in this room right now. */
   occupied?: boolean
+  /** The room is out of service, e.g. under renovation. */
+  closed?: boolean
   selected?: boolean
   state?: CellState
   onSelect?: (id: string) => void
@@ -79,6 +92,7 @@ interface MapCellProps {
 export function MapCell({
   space,
   occupied = false,
+  closed = false,
   selected = false,
   state = "idle",
   onSelect,
@@ -89,6 +103,7 @@ export function MapCell({
     cellVariants({
       kind: space.kind,
       occupied,
+      closed,
       selected,
       state: selected ? "idle" : state,
     }),
@@ -131,7 +146,24 @@ export function MapCell({
       {/* The tint alone would leave this state invisible to anyone who cannot
           see the colour, and unreachable by assistive tech. */}
       {occupied ? <span className="sr-only">In use</span> : null}
+      {closed ? <ClosedLabel /> : null}
     </button>
+  )
+}
+
+/** The word a closed room carries under its code. */
+function ClosedLabel() {
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        className="plate-label mt-0.5 max-w-full leading-tight opacity-70 [--label-advance:0.58]"
+        style={{ "--label-chars": 10 } as React.CSSProperties}
+      >
+        Renovation
+      </span>
+      <span className="sr-only">Under renovation</span>
+    </>
   )
 }
 

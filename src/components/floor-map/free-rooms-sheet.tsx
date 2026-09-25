@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { CLASS_ROOMS } from "@/lib/floor-plan/data"
+import { CLASS_ROOMS, ROOM_STATUS_LABEL } from "@/lib/floor-plan/data"
 import {
   freeWindows,
   teachingDay,
@@ -102,6 +102,7 @@ function FreeRooms({
             <RoomRow
               key={room.id}
               code={room.code ?? room.id}
+              closedLabel={room.status ? ROOM_STATUS_LABEL[room.status] : null}
               windows={freeWindows(schedulesByRoom[room.id] ?? [], today, day)}
               day={day}
               minutes={minutes}
@@ -123,12 +124,15 @@ function FreeRooms({
  */
 function RoomRow({
   code,
+  closedLabel,
   windows,
   day,
   minutes,
   onSelect,
 }: {
   code: string
+  /** Set when the room is out of service; shown instead of its free time. */
+  closedLabel: string | null
   windows: readonly TimeWindow[]
   day: TimeWindow
   minutes: number
@@ -149,7 +153,9 @@ function RoomRow({
           {code}
         </span>
 
-        {windows.length === 0 ? (
+        {closedLabel ? (
+          <span className="text-xs text-muted-foreground">{closedLabel}</span>
+        ) : windows.length === 0 ? (
           <span className="text-xs text-muted-foreground">
             No free time today
           </span>

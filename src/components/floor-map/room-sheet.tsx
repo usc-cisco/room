@@ -1,6 +1,6 @@
 "use client"
 
-import { CalendarOff } from "lucide-react"
+import { CalendarOff, Construction } from "lucide-react"
 
 import {
   Sheet,
@@ -9,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { ROOM_STATUS_LABEL } from "@/lib/floor-plan/data"
 import type { ClassRoom } from "@/lib/floor-plan/types"
 import { roomAvailability } from "@/lib/schedules/availability"
 import {
@@ -84,11 +85,33 @@ function RoomDay({
         <SheetDescription>
           {subtitle}
           {dayName(today)}
-          {todays.length > 0 &&
+          {!room.status &&
+            todays.length > 0 &&
             ` · ${todays.length} ${todays.length === 1 ? "class" : "classes"}`}
         </SheetDescription>
       </SheetHeader>
 
+      {room.status ? (
+        <ClosedRoom label={ROOM_STATUS_LABEL[room.status]} />
+      ) : (
+        <RoomToday todays={todays} today={today} minutes={minutes} />
+      )}
+    </>
+  )
+}
+
+/** Today's status band and classes for a room in service. */
+function RoomToday({
+  todays,
+  today,
+  minutes,
+}: {
+  todays: readonly RoomSchedule[]
+  today: number
+  minutes: number
+}) {
+  return (
+    <>
       {/* Held back when nothing is on today: `EmptyDay` below already says the
           room is free all day, and says it better. */}
       {todays.length > 0 ? (
@@ -180,6 +203,27 @@ function RoomStatus({
         {detail ? (
           <p className="text-xs text-muted-foreground">{detail}</p>
         ) : null}
+      </div>
+    </div>
+  )
+}
+
+/** Shown in place of the day for a room that is out of service. */
+function ClosedRoom({ label }: { label: string }) {
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
+      <span
+        aria-hidden="true"
+        className="flex size-12 shrink-0 items-center justify-center bg-muted/40 outline-1 -outline-offset-1 outline-muted-foreground/50 outline-dashed"
+      >
+        <Construction className="size-5 text-muted-foreground" />
+      </span>
+
+      <div className="grid gap-1">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs/relaxed text-balance text-muted-foreground">
+          This room is closed and not available for use.
+        </p>
       </div>
     </div>
   )
